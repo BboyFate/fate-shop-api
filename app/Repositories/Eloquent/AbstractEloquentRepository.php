@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Account\Repositories;
+namespace App\Repositories\Eloquent;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Account\Repositories\Contracts\BaseRepository;
-use App\Account\Models\User;
+use App\Repositories\Contracts\BaseRepository;
+use App\Repositories\Models\User;
 
 abstract class AbstractEloquentRepository implements BaseRepository
 {

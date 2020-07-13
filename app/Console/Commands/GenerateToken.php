@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use App\Account\Models\User;
+use App\Repositories\Models\User;
 
 class GenerateToken extends Command
 {

@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Account\Services;
+namespace App\Services;
 
 use Illuminate\Support\Str;
-use App\Account\Repositories\Contracts\UserRepository;
+use App\Repositories\Contracts\UserRepository;
 
 class UserService
 {

@@ -4,9 +4,9 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use App\Account\Models\User;
-use App\Account\Repositories\Contracts\UserRepository;
-use App\Account\Repositories\EloquentUserRepository;
+use App\Repositories\Models\User;
+use App\Repositories\Contracts\UserRepository;
+use App\Repositories\Eloquent\EloquentUserRepository;
 
 class RepositoriesServiceProvider extends ServiceProvider
 {

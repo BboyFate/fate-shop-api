@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Account\Repositories;
+namespace App\Repositories\Eloquent;
 
-use App\Account\Models\User;
-use App\Account\Repositories\Contracts\UserRepository;
+use App\Repositories\Models\User;
+use App\Repositories\Contracts\UserRepository;
 
 class EloquentUserRepository extends AbstractEloquentRepository implements UserRepository
 {
