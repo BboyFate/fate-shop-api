@@ -9,7 +9,7 @@
  * with this source code in the file LICENSE.
  */
 
-namespace App\Repositories\Contracts;
+namespace App\Support\Contracts;
 
 use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Support\Facades\Lang;

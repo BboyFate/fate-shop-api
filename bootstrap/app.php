@@ -102,7 +102,7 @@ $app->routeMiddleware([
 /*
 * Application Service Providers...
 */
-// $app->register(App\Providers\AppServiceProvider::class);
+$app->register(App\Providers\AppServiceProvider::class);
 $app->register(App\Providers\AuthServiceProvider::class);
 $app->register(App\Providers\EventServiceProvider::class);
 
@@ -116,7 +116,6 @@ $app->register(SocialiteProviders\Manager\ServiceProvider::class);
 /*
  * Custom Service Providers.
  */
-$app->register(App\Providers\RepositoriesServiceProvider::class);
 $app->register(App\Providers\EasySmsServiceProvider::class);
 
 /*
@@ -134,7 +133,7 @@ $app->router->group([
     'namespace' => 'App\Http\Controllers',
 ], function ($router) {
     require __DIR__.'/../routes/api/v1.php';
-    require __DIR__.'/../routes/web.php';
+    // require __DIR__.'/../routes/web.php';
 });
 
 return $app;

@@ -4,7 +4,7 @@ namespace App\Support;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Response as HttpResponse;
-use App\Repositories\Contracts\ResponseConstant;
+use App\Support\Contracts\ResponseConstant;
 
 class Response
 {

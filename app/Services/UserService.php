@@ -2,18 +2,11 @@
 
 namespace App\Services;
 
+use App\Models\User;
 use Illuminate\Support\Str;
-use App\Repositories\Contracts\UserRepository;
 
 class UserService
 {
-    private $repository;
-
-    public function __construct(UserRepository $repository)
-    {
-        $this->repository = $repository;
-    }
-
     /**
      * 手机号码或邮箱密码登录
      *
@@ -33,14 +26,14 @@ class UserService
 
     /**
      * @param $phone
-     * @return mixed
+     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|object|null
      */
     public function phoneRegister($phone)
     {
-        $user = $this->repository->getModel()->where('phone', $phone)->first();
+        $user = User::query()->where('phone', $phone)->first();
 
         if (empty($user)) {
-            $user = $this->repository->create([
+            $user = User::query()->create([
                 'nickname' => '用户_' . Str::random(8),
                 'phone' => $phone,
             ]);
