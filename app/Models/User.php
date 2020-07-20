@@ -62,4 +62,9 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
             ->withTimestamps()
             ->orderBy('user_favorite_products.created_at', 'desc');
     }
+
+    public function addresses()
+    {
+        return $this->hasMany(UserAddress::class);
+    }
 }

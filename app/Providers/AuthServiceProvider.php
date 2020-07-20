@@ -2,9 +2,9 @@
 
 namespace App\Providers;
 
-use App\Models\User;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
+use App\Models\User;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -34,6 +34,13 @@ class AuthServiceProvider extends ServiceProvider
             if ($request->input('api_token')) {
                 return User::where('api_token', $request->input('api_token'))->first();
             }
+        });
+
+        // 自定义策略文件的寻找逻辑
+        Gate::guessPolicyNamesUsing(function($class) {
+            // class_basename 是 Laravel 提供的一个辅助函数，可以获取类的简短名称
+            // 例如传入 \App\Models\User 会返回 User
+            return '\\App\\Policies\\' . class_basename($class) . 'Policy';
         });
     }
 }

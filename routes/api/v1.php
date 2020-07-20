@@ -74,5 +74,25 @@ $router->group([
             'uses' => 'ProductsController@disfavor',
             'as' => 'api.v1.products.disfavor'
         ]);
+
+        /**
+         * 用户收货地址
+         */
+        $router->get('user_addresses', [
+            'uses' => 'UserAddressesController@index',
+            'as' => 'api.v1.user_addresses.index'
+        ]);
+        $router->post('user_addresses', [
+            'uses' => 'UserAddressesController@store',
+            'as' => 'api.v1.user_addresses.store'
+        ]);
+        $router->put('user_addresses/{user_address}', [
+            'uses' => 'UserAddressesController@update',
+            'as' => 'api.v1.user_addresses.update'
+        ]);
+        $router->delete('user_addresses/{user_address}', [
+            'uses' => 'UserAddressesController@destroy',
+            'as' => 'api.v1.user_addresses.destroy'
+        ]);
     });
 });

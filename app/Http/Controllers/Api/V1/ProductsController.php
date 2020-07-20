@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use App\Models\Product;
 use App\SearchBuilders\ProductSearchBuilder;
-use App\Resources\ProductResource;
+use App\Http\Resources\ProductResource;
 
 class ProductsController extends Controller
 {
