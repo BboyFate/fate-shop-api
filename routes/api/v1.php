@@ -4,6 +4,14 @@ $router->group([
     'prefix' => 'api/v1',
     'namespace' => 'Api\V1'
 ], function () use ($router) {
+
+    // 秒杀商品
+    $router->post('seckill_orders', [
+        'middleware' => 'random_drop:5',
+        'uses' => 'OrdersController@seckill',
+        'as' => 'api.v1.seckill_orders.store'
+    ]);
+
     // 图片验证码
     $router->post('captchas', [
         'uses' => 'CaptchasController@store',
@@ -93,6 +101,23 @@ $router->group([
         $router->delete('user_addresses/{user_address}', [
             'uses' => 'UserAddressesController@destroy',
             'as' => 'api.v1.user_addresses.destroy'
+        ]);
+
+
+        /**
+         * 购物车
+         */
+        $router->get('cart', [
+            'uses' => 'CartController@index',
+            'as' => 'api.v1.cart.index'
+        ]);
+        $router->post('cart', [
+            'uses' => 'CartController@store',
+            'as' => 'api.v1.cart.store'
+        ]);
+        $router->delete('cart/{sku}', [
+            'uses' => 'CartController@destroy',
+            'as' => 'api.v1.cart.destroy'
         ]);
     });
 });

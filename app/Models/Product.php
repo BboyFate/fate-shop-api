@@ -53,6 +53,16 @@ class Product extends Model
         return $this->hasMany(ProductProperty::class);
     }
 
+    public function crowdfunding()
+    {
+        return $this->hasOne(CrowdfundingProduct::class);
+    }
+
+    public function seckill()
+    {
+        return $this->hasOne(SeckillProduct::class);
+    }
+
     /**
      * 访问器
      * 图片的绝对路径
