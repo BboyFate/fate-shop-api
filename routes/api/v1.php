@@ -12,18 +12,23 @@ $router->group([
         'as' => 'api.v1.seckill_orders.store'
     ]);
 
+    /**
+     * 验证
+     */
     // 图片验证码
     $router->post('captchas', [
         'uses' => 'CaptchasController@store',
         'as' => 'api.v1.captchas.store'
     ]);
-
     // 短信验证码
     $router->post('verificationCodes', [
         'uses' => 'VerificationCodesController@store',
         'as' => 'api.v1.verificationCodes.store'
     ]);
 
+    /**
+     * 授权登录
+     */
     // 账号密码登录
     $router->post('authorizations', [
         'uses' => 'AuthorizationsController@store',
@@ -50,7 +55,6 @@ $router->group([
         'as' => 'api.v1.authorizations.destroy'
     ]);
 
-
     /**
      * 商品
      */
@@ -61,6 +65,14 @@ $router->group([
     $router->get('products/{id:[0-9]+}', [
         'uses' => 'ProductsController@show',
         'as' => 'api.v1.products.show'
+    ]);
+
+    /**
+     * 支付
+     */
+    $router->get('payment/wechat/notify', [
+        'uses' => 'PaymentController@wechatNotify',
+        'as' => 'api.v1.payment.wechat.notify'
     ]);
 
     /**
@@ -103,7 +115,6 @@ $router->group([
             'as' => 'api.v1.user_addresses.destroy'
         ]);
 
-
         /**
          * 购物车
          */
@@ -118,6 +129,46 @@ $router->group([
         $router->delete('cart/{sku}', [
             'uses' => 'CartController@destroy',
             'as' => 'api.v1.cart.destroy'
+        ]);
+
+        /**
+         * 订单
+         */
+        $router->get('orders', [
+            'uses' => 'OrdersController@index',
+            'as' => 'api.v1.orders.index'
+        ]);
+        $router->get('orders/{order}', [
+            'uses' => 'OrdersController@show',
+            'as' => 'api.v1.orders.show'
+        ]);
+        $router->post('orders', [
+            'uses' => 'OrdersController@store',
+            'as' => 'api.v1.orders.store'
+        ]);
+        $router->post('orders/{order}/received', [
+            'uses' => 'OrdersController@received',
+            'as' => 'api.v1.orders.received'
+        ]);
+        $router->post('orders/{order}/review', [
+            'uses' => 'OrdersController@sendReview',
+            'as' => 'api.v1.orders.review.store'
+        ]);
+        $router->post('orders/{order}/apply_refund', [
+            'uses' => 'OrdersController@applyRefund',
+            'as' => 'api.v1.orders.apply_refund'
+        ]);
+        $router->post('crowdfunding_orders', [
+            'uses' => 'OrdersController@crowdfunding',
+            'as' => 'api.v1.crowdfunding_orders.store'
+        ]);
+
+        /**
+         * 支付
+         */
+        $router->post('payment/{order}/wechat_mini', [
+            'uses' => 'PaymentController@payByWechatMiniapp',
+            'as' => 'api.v1.payment.wechatMini'
         ]);
     });
 });

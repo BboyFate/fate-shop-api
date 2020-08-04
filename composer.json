@@ -7,11 +7,14 @@
     "require": {
         "php": "^7.2",
         "elasticsearch/elasticsearch": "~7.0",
+        "illuminate/redis": "^6.18.31",
         "laravel/lumen-framework": "^6.0",
         "overtrue/easy-sms": "^1.1",
         "overtrue/laravel-lang": "~3.0",
         "socialiteproviders/weixin": "^4.0",
-        "tymon/jwt-auth": "^1.0"
+        "spatie/laravel-query-builder": "^2.8",
+        "tymon/jwt-auth": "^1.0",
+        "yansongda/laravel-pay": "^2.2"
     },
     "require-dev": {
         "fzaninotto/faker": "^1.4",

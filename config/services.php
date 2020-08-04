@@ -31,7 +31,7 @@ return [
     ],
 
     'stripe' => [
-        'model' => App\User::class,
+        'model' => App\Models\User::class,
         'key' => env('STRIPE_KEY'),
         'secret' => env('STRIPE_SECRET'),
         'webhook' => [
@@ -41,8 +41,8 @@ return [
     ],
 
     'weixin' => [
-        'client_id' => env('WEIXIN_KEY'),
-        'client_secret' => env('WEIXIN_SECRET'),
+        'client_id' => env('WECHAT_APP_ID'),
+        'client_secret' => env('WECHAT_APP_SECRET'),
         'redirect' => env('WEIXIN_REDIRECT_URI')
     ],
 

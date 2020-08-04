@@ -2,8 +2,12 @@
 
 namespace App\Providers;
 
+use Illuminate\Http\Resources\Json\Resource;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
 use Elasticsearch\ClientBuilder as ESClientBuilder;
+use Monolog\Logger;
+use Yansongda\Pay\Pay;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -26,5 +30,31 @@ class AppServiceProvider extends ServiceProvider
 
             return $builder->build();
         });
+    }
+
+    public function boot()
+    {
+        // API 资源禁用顶层资源的包裹
+        Resource::withoutWrapping();
+
+        $this->app->singleton('wechat_pay', function () {
+            $config = config('pay.wechat');
+            $config['notify_url'] = route('api.v1.payment.wechat.notify');
+
+            if (app()->environment() !== 'production') {
+                $config['log']['level'] = Logger::DEBUG;
+            } else {
+                $config['log']['level'] = Logger::WARNING;
+            }
+
+            return Pay::wechat($config);
+        });
+
+        // 只在本地开发环境启用 SQL 日志
+        if (app()->environment('local')) {
+            \DB::listen(function ($query) {
+                \Log::info(Str::replaceArray('?', $query->bindings, $query->sql));
+            });
+        }
     }
 }

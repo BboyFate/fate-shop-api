@@ -81,11 +81,12 @@ $app->configure('easysms');
 */
 
 // $app->middleware([
-//     App\Http\Middleware\ExampleMiddleware::class
+//     App\Http\Middleware\RandomDropSeckillRequest::class
 // ]);
 
 $app->routeMiddleware([
     'auth' => App\Http\Middleware\Authenticate::class,
+    'random_drop' => App\Http\Middleware\RandomDropSeckillRequest::class,
 ]);
 
 /*
@@ -112,6 +113,8 @@ $app->register(App\Providers\EventServiceProvider::class);
 $app->register(Tymon\JWTAuth\Providers\LumenServiceProvider::class);
 $app->register(Overtrue\LaravelLang\TranslationServiceProvider::class);
 $app->register(SocialiteProviders\Manager\ServiceProvider::class);
+$app->register(Illuminate\Redis\RedisServiceProvider::class);
+$app->register(Yansongda\LaravelPay\PayServiceProvider::class);
 
 /*
  * Custom Service Providers.
