@@ -11,6 +11,7 @@
         "laravel/lumen-framework": "^6.0",
         "overtrue/easy-sms": "^1.1",
         "overtrue/laravel-lang": "~3.0",
+        "ramsey/uuid": "^4.1",
         "socialiteproviders/weixin": "^4.0",
         "spatie/laravel-query-builder": "^2.8",
         "tymon/jwt-auth": "^1.0",
