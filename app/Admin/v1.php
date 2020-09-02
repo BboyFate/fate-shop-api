@@ -117,5 +117,33 @@ $router->group([
             ]);
         });
 
+        /**
+         * 管理用户
+         */
+        $router->group([], function ($router) {
+            $router->get('users', [
+                'uses' => 'UsersController@index',
+                'as' => 'api.v1.admin.users.index'
+            ]);
+            $router->get('users/{id:[0-9]+}', [
+                'uses' => 'UsersController@show',
+                'as' => 'api.v1.admin.users.show'
+            ]);
+        });
+
+        /**
+         * 管理用户地址
+         */
+        $router->group([], function ($router) {
+            $router->get('user_addresses', [
+                'uses' => 'UserAddressesController@index',
+                'as' => 'api.v1.admin.user_addresses.index'
+            ]);
+            $router->get('user_addresses/{id:[0-9]+}', [
+                'uses' => 'UserAddressesController@show',
+                'as' => 'api.v1.admin.user_addresses.show'
+            ]);
+        });
+
     });
 });
