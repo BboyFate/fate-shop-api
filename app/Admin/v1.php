@@ -43,80 +43,79 @@ $router->group([
             'as' => 'api.v1.admin.images.store'
         ]);
 
-        $router->group([], function ($router) {
+        $router->group(['namespace' => 'Auth'], function ($router) {
             /**
              * 管理员
              */
-            $router->get('users', [
+            $router->get('auth/users', [
                 'uses' => 'UsersController@index',
-                'as' => 'api.v1.admin.users.index'
+                'as' => 'api.v1.admin.auth.users.index'
             ]);
-            $router->get('users/{id:[0-9]+}', [
+            $router->get('auth/users/{id:[0-9]+}', [
                 'uses' => 'UsersController@show',
-                'as' => 'api.v1.admin.users.show'
+                'as' => 'api.v1.admin.auth.users.show'
             ]);
-            $router->post('users', [
+            $router->post('auth/users', [
                 'uses' => 'UsersController@store',
-                'as' => 'api.v1.admin.users.store'
+                'as' => 'api.v1.admin.auth.users.store'
             ]);
-            $router->patch('users/{id:[0-9]+}', [
+            $router->patch('auth/users/{id:[0-9]+}', [
                 'uses' => 'UsersController@update',
-                'as' => 'api.v1.admin.users.update'
+                'as' => 'api.v1.admin.auth.users.update'
             ]);
-            $router->delete('users/{user}', [
+            $router->delete('auth/users/{user}', [
                 'uses' => 'UsersController@destroy',
-                'as' => 'api.v1.admin.users.destroy'
+                'as' => 'api.v1.admin.auth.users.destroy'
             ]);
 
             /**
              * 权限
              */
-            $router->get('permissions', [
+            $router->get('auth/permissions', [
                 'uses' => 'PermissionsController@index',
-                'as' => 'api.v1.admin.permissions.index'
+                'as' => 'api.v1.admin.auth.permissions.index'
             ]);
-            $router->get('permissions/{id:[0-9]+}', [
+            $router->get('auth/permissions/{id:[0-9]+}', [
                 'uses' => 'PermissionsController@show',
-                'as' => 'api.v1.admin.permissions.show'
+                'as' => 'api.v1.admin.auth.permissions.show'
             ]);
-            $router->post('permissions', [
+            $router->post('auth/permissions', [
                 'uses' => 'PermissionsController@store',
-                'as' => 'api.v1.admin.permissions.store'
+                'as' => 'api.v1.admin.auth.permissions.store'
             ]);
-            $router->patch('permissions/{id:[0-9]+}', [
+            $router->patch('auth/permissions/{id:[0-9]+}', [
                 'uses' => 'PermissionsController@update',
-                'as' => 'api.v1.admin.permissions.update'
+                'as' => 'api.v1.admin.auth.permissions.update'
             ]);
-            $router->delete('permissions/{role}', [
+            $router->delete('auth/permissions/{role}', [
                 'uses' => 'PermissionsController@destroy',
-                'as' => 'api.v1.admin.permissions.destroy'
+                'as' => 'api.v1.admin.auth.permissions.destroy'
             ]);
 
             /**
              * 角色
              */
-            $router->get('roles', [
+            $router->get('auth/roles', [
                 'uses' => 'RolesController@index',
-                'as' => 'api.v1.admin.roles.index'
+                'as' => 'api.v1.admin.auth.roles.index'
             ]);
-            $router->get('roles/{id:[0-9]+}', [
+            $router->get('auth/roles/{id:[0-9]+}', [
                 'uses' => 'RolesController@show',
-                'as' => 'api.v1.admin.roles.show'
+                'as' => 'api.v1.admin.auth.roles.show'
             ]);
-            $router->post('roles', [
+            $router->post('auth/roles', [
                 'uses' => 'RolesController@store',
-                'as' => 'api.v1.admin.roles.store'
+                'as' => 'api.v1.admin.auth.roles.store'
             ]);
-            $router->patch('roles/{id:[0-9]+}', [
+            $router->patch('auth/roles/{id:[0-9]+}', [
                 'uses' => 'RolesController@update',
-                'as' => 'api.v1.admin.roles.update'
+                'as' => 'api.v1.admin.auth.roles.update'
             ]);
-            $router->delete('roles/{role}', [
+            $router->delete('auth/roles/{role}', [
                 'uses' => 'RolesController@destroy',
-                'as' => 'api.v1.admin.roles.destroy'
+                'as' => 'api.v1.admin.auth.roles.destroy'
             ]);
         });
 
-        
     });
 });

@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Admin\Controllers\V1;
+namespace App\Admin\Controllers\V1\Auth;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use App\Admin\Controllers\V1\Controller;
 use App\Admin\Models\AdminUser;
 use App\Admin\Models\AdminImage;
 use App\Admin\Resources\AdminUserResource;
