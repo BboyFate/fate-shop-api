@@ -19,6 +19,7 @@ class Product extends Model
 
     protected $fillable = [
         'title',
+        'long_title',
         'description',
         'image',
         'on_sale',
@@ -41,11 +42,6 @@ class Product extends Model
     public function skus()
     {
         return $this->hasMany(ProductSku::class);
-    }
-
-    public function skuAttributes()
-    {
-        return $this->hasMany(ProductSkuAttributes::class);
     }
 
     public function properties()

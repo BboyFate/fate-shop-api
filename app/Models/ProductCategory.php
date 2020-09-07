@@ -45,6 +45,11 @@ class ProductCategory extends Model
         return $this->hasMany(Product::class);
     }
 
+    public function skuAttributes()
+    {
+        return $this->hasMany(ProductSkuAttribute::class, 'product_category_id');
+    }
+
     /**
      * 访问器
      * 获取所有祖先类目的 ID 值

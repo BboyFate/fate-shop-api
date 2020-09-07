@@ -16,8 +16,8 @@ class CreateProductSkuAttributesTable extends Migration
         Schema::create('product_sku_attributes', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('name')->comment('多维度 SKU 名称');
-            $table->unsignedBigInteger('product_id');
-            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
+            $table->unsignedBigInteger('product_category_id');
+            $table->foreign('product_category_id')->references('id')->on('product_categories')->onDelete('cascade');
             $table->dateTime('created_at');
             $table->dateTime('updated_at');
         });

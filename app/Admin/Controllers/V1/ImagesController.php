@@ -29,7 +29,7 @@ class ImagesController extends Controller
     public function storeRequestValidationRules($type)
     {
         $rules = [
-            'type' => 'required|string|in:avatar',
+            'type' => 'required|string|in:avatar,product',
         ];
 
         if ($type == 'avatar') {

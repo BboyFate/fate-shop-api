@@ -145,5 +145,57 @@ $router->group([
             ]);
         });
 
+        /**
+         * 商品管理
+         */
+        $router->group([], function ($router) {
+            $router->get('products', [
+                'uses' => 'ProductsController@index',
+                'as' => 'api.v1.admin.products.index'
+            ]);
+            $router->get('products/{id:[0-9]+}', [
+                'uses' => 'ProductsController@show',
+                'as' => 'api.v1.admin.products.show'
+            ]);
+            $router->post('products', [
+                'uses' => 'ProductsController@store',
+                'as' => 'api.v1.admin.products.store'
+            ]);
+            $router->patch('products/{id:[0-9]+}', [
+                'uses' => 'ProductsController@update',
+                'as' => 'api.v1.admin.products.update'
+            ]);
+            $router->delete('products/{product}', [
+                'uses' => 'ProductsController@destroy',
+                'as' => 'api.v1.admin.products.destroy'
+            ]);
+        });
+
+        /**
+         * 商品类目管理
+         */
+        $router->group([], function ($router) {
+            $router->get('product_categories', [
+                'uses' => 'ProductCategoriesController@index',
+                'as' => 'api.v1.admin.product_categories.index'
+            ]);
+            $router->get('product_categories/{id:[0-9]+}', [
+                'uses' => 'ProductCategoriesController@show',
+                'as' => 'api.v1.admin.product_categories.show'
+            ]);
+            $router->post('product_categories', [
+                'uses' => 'ProductCategoriesController@store',
+                'as' => 'api.v1.admin.product_categories.store'
+            ]);
+            $router->patch('product_categories/{id:[0-9]+}', [
+                'uses' => 'ProductCategoriesController@update',
+                'as' => 'api.v1.admin.product_categories.update'
+            ]);
+            $router->delete('product_categories/{product}', [
+                'uses' => 'ProductCategoriesController@destroy',
+                'as' => 'api.v1.admin.product_categories.destroy'
+            ]);
+        });
+
     });
 });
