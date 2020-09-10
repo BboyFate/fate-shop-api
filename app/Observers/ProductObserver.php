@@ -4,12 +4,13 @@
 namespace App\Observers;
 
 use App\Models\Product;
+use App\Jobs\SyncOneProductToEs;
 
 class ProductObserver
 {
-    public function saving(Product $product)
+    public function saved(Product $product)
     {
-        \Log::info($product);
-        \Log::info($product->skus);
+        // 新增或更新产品，都同步更新一下 Elasticsearch
+        dispatch(new SyncOneProductToEs($product));
     }
 }

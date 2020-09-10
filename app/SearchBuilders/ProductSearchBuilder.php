@@ -45,6 +45,20 @@ class ProductSearchBuilder
     }
 
     /**
+     * 筛选商品类型
+     *
+     * @param $type
+     *
+     * @return $this
+     */
+    public function productType($type)
+    {
+        $this->params['body']['query']['bool']['filter'][] = ['term' => ['type' => $type]];
+
+        return $this;
+    }
+
+    /**
      * 按类目筛选商品
      *
      * @param ProductCategory $category

@@ -21,6 +21,13 @@ class ProductService
             $product->category()->associate($productData['category_id']);
             $product->save();
 
+            if ($productData['type'] === Product::TYPE_CROWDFUNDING) {
+                $product->crowdfunding()->create([
+                    'target_amount' => $productData['target_amount'],
+                    'end_at'        => $productData['end_at'],
+                ]);
+            }
+
             if ($productData['skus']) {
                 foreach ($productData['skus'] as $data) {
                     $sku = $product->skus()->create([
@@ -60,6 +67,13 @@ class ProductService
             ]);
 
             $product->category()->associate($productData['category_id']);
+
+            if ($productData['type'] === Product::TYPE_CROWDFUNDING) {
+                $product->crowdfunding()->update([
+                    'target_amount' => $productData['target_amount'],
+                    'end_at'        => $productData['end_at'],
+                ]);
+            }
 
             if ($productData['skus']) {
                 foreach ($productData['skus'] as $data) {

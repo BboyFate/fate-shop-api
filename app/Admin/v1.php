@@ -149,6 +149,9 @@ $router->group([
          * 商品管理
          */
         $router->group([], function ($router) {
+            /**
+             * 普通商品
+             */
             $router->get('products', [
                 'uses' => 'ProductsController@index',
                 'as' => 'api.v1.admin.products.index'
@@ -168,6 +171,30 @@ $router->group([
             $router->delete('products/{product}', [
                 'uses' => 'ProductsController@destroy',
                 'as' => 'api.v1.admin.products.destroy'
+            ]);
+
+            /**
+             * 众筹商品
+             */
+            $router->get('crowdfunding_products', [
+                'uses' => 'CrowdfundingProductsController@index',
+                'as' => 'api.v1.admin.crowdfunding_products.index'
+            ]);
+            $router->get('crowdfunding_products/{id:[0-9]+}', [
+                'uses' => 'CrowdfundingProductsController@show',
+                'as' => 'api.v1.admin.crowdfunding_products.show'
+            ]);
+            $router->post('crowdfunding_products', [
+                'uses' => 'CrowdfundingProductsController@store',
+                'as' => 'api.v1.admin.crowdfunding_products.store'
+            ]);
+            $router->patch('crowdfunding_products/{id:[0-9]+}', [
+                'uses' => 'CrowdfundingProductsController@update',
+                'as' => 'api.v1.admin.crowdfunding_products.update'
+            ]);
+            $router->delete('crowdfunding_products/{product}', [
+                'uses' => 'CrowdfundingProductsController@destroy',
+                'as' => 'api.v1.admin.crowdfunding_products.destroy'
             ]);
         });
 
@@ -194,6 +221,24 @@ $router->group([
             $router->delete('product_categories/{product}', [
                 'uses' => 'ProductCategoriesController@destroy',
                 'as' => 'api.v1.admin.product_categories.destroy'
+            ]);
+        });
+
+        /**
+         * 订单管理
+         */
+        $router->group([], function ($router) {
+            $router->get('orders', [
+                'uses' => 'OrdersController@index',
+                'as' => 'api.v1.admin.orders.index'
+            ]);
+            $router->get('orders/{order:[0-9]+}', [
+                'uses' => 'OrdersController@show',
+                'as' => 'api.v1.admin.orders.show'
+            ]);
+            $router->patch('orders/{order:[0-9]+}/ship', [
+                'uses' => 'OrdersController@ship',
+                'as' => 'api.v1.admin.orders.ship'
             ]);
         });
 

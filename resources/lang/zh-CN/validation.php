@@ -174,5 +174,9 @@ return [
         'time'                  => '时间',
         'available'             => '可用的',
         'size'                  => '大小',
+        'express_company'       => '物流公司',
+        'express_no'            => '物流单号',
+        'target_amount'         => '众筹目标金额',
+        'end_at'                => '众筹结束时间',
     ],
 ];

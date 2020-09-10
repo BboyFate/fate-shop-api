@@ -56,5 +56,7 @@ class AppServiceProvider extends ServiceProvider
                 \Log::info(Str::replaceArray('?', $query->bindings, $query->sql));
             });
         }
+
+        \App\Models\Product::observe(\App\Observers\ProductObserver::class);
     }
 }
