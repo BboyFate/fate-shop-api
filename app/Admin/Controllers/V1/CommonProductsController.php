@@ -8,7 +8,6 @@ use App\Admin\Models\AdminImage;
 use App\Admin\Resources\ProductResource;
 use App\Models\Product;
 use App\Models\ProductCategory;
-use App\Models\ProductSkuAttribute;
 use App\SearchBuilders\ProductSearchBuilder;
 use App\Services\ProductService;
 
@@ -76,7 +75,7 @@ abstract class CommonProductsController extends Controller
 
     public function store(Request $request, ProductService $service)
     {
-        $this->validateRequest($request, $this->requestValidationRules($request->input('category_id')));
+        $this->validateRequest($request, 'requestValidation');
 
         $image = AdminImage::query()->find($request->product_image_id);
 
@@ -102,7 +101,7 @@ abstract class CommonProductsController extends Controller
     public function update(Request $request, $id, ProductService $service)
     {
         $product = Product::query()->findOrFail($id);
-        $this->validateRequest($request, $this->requestValidationRules($product->category_id));
+        $this->validateRequest($request, 'requestValidation');
 
         $image = AdminImage::query()->find($request->product_image_id);
 
@@ -132,50 +131,5 @@ abstract class CommonProductsController extends Controller
         $product->delete();
 
         return $this->response->noContent();
-    }
-
-    protected function requestValidationRules($categoryId)
-    {
-        $rules = [
-            'title'                     => 'required',
-            'long_title'                => 'required',
-            'description'               => 'required',
-            'on_sale'                   => 'required|boolean',
-            'category_id'               => 'required|exists:product_categories,id',
-            'product_image_id'          => 'required|exists:admin_images,id',
-            'skus'                      => 'array',
-            'skus.*.name'               => 'required',
-            'skus.*.description'        => 'required',
-            'skus.*.price'              => 'required|numeric|min:0.01',
-            'skus.*.stock'              => 'required|integer|min:0',
-            'skus.*.attributes'         => 'array',
-            'skus.*.attributes.*.id'    => [
-                'required',
-                'integer',
-                function ($attribute, $value, $fail) use ($categoryId) {
-                    $skuAttribute = ProductSkuAttribute::query()->find($value);
-                    if (! $skuAttribute) {
-                        $fail('不存在该商品 SKU 规格');
-                        return;
-                    }
-
-                    if ($categoryId != $skuAttribute->product_category_id) {
-                        $fail('规格和分类不对应');
-                        return;
-                    }
-                }
-            ],
-            'skus.*.attributes.*.value' => 'required',
-            'properties'                => 'array',
-            'properties.*.name'         => 'required',
-            'properties.*.value'        => 'required',
-        ];
-
-        if ($this->getProductType() === Product::TYPE_CROWDFUNDING) {
-            $rules['target_amount'] = 'required|numeric|min:0.01';
-            $rules['end_at']        = 'required|date';
-        }
-
-        return $rules;
     }
 }

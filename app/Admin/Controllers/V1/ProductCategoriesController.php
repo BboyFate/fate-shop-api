@@ -32,9 +32,7 @@ class ProductCategoriesController extends Controller
 
     public function store(Request $request)
     {
-        $isDirectory = $request->input('is_directory');
-
-        $this->validateRequest($request, $this->storeRequestValidationRules($isDirectory));
+        $this->validateRequest($request);
 
         $name = $request->input('name');
         $categoryParent = ProductCategory::query()->find($request->input('parent_id', 0));
@@ -70,33 +68,10 @@ class ProductCategoriesController extends Controller
         return new ProductCategoryResource($category);
     }
 
-    protected function storeRequestValidationRules($isDirectory)
-    {
-        return [
-            'name'              => 'required|unique:product_categories,name',
-            'is_directory'      => 'required|boolean',
-            'parent_id'         => [
-                'integer',
-                function ($attribute, $value, $fail) use ($isDirectory) {
-                    if (! $parent = ProductCategory::query()->find($value)) {
-                        $fail('该父类目不存在');
-                        return;
-                    }
-
-                    if ($isDirectory) {
-                        $fail('创建顶层类目的，不能有父级类目');
-                        return;
-                    }
-                }],
-            'attributes'        => 'array',
-            'attributes.*.name' => 'filled',
-        ];
-    }
-
     public function update(Request $request, $id)
     {
         $category = ProductCategory::query()->findOrFail($id);
-        $this->validateRequest($request, $this->updateRequestValidationRules());
+        $this->validateRequest($request);
 
         $name = $request->input('name');
         $attributes = $request->input('attributes');
@@ -120,15 +95,6 @@ class ProductCategoriesController extends Controller
         });
 
         return new ProductCategoryResource($category);
-    }
-
-    protected function updateRequestValidationRules()
-    {
-        return [
-            'name'              => 'required|unique:product_categories,name',
-            'attributes'        => 'array',
-            'attributes.*.name' => 'filled',
-        ];
     }
 
     public function destroy($id)

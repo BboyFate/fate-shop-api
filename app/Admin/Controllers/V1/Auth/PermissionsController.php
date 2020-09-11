@@ -9,7 +9,7 @@ use App\Admin\Resources\AdminPermissionResource;
 
 class PermissionsController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
         $roles = Permission::query()->paginate();
 
@@ -18,7 +18,7 @@ class PermissionsController extends Controller
 
     public function store(Request $request)
     {
-        $this->validateRequest($request, $this->storeRequestValidationRules());
+        $this->validateRequest($request);
 
         $permission = Permission::create(['name' => $request->input('name')]);
 
@@ -42,7 +42,7 @@ class PermissionsController extends Controller
     public function update(Request $request, $id)
     {
         $permission = Permission::query()->findOrFail($id);
-        $this->validateRequest($request, $this->updateRequestValidationRules($permission->id));
+        $this->validateRequest($request);
 
         $permission->update(['name' => $request->input('name')]);
 
@@ -55,19 +55,5 @@ class PermissionsController extends Controller
         $admin->delete();
 
         return $this->response->noContent();
-    }
-
-    protected function storeRequestValidationRules()
-    {
-        return [
-            'name' => 'required|string|unique:admin_permissions',
-        ];
-    }
-
-    protected function updateRequestValidationRules($permissionId)
-    {
-        return [
-            'name' => 'required|string|unique:admin_permissions,name,' . $permissionId,
-        ];
     }
 }

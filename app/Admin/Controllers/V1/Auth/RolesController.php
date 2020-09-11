@@ -9,7 +9,7 @@ use App\Admin\Resources\AdminRoleResource;
 
 class RolesController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
         $roles = Role::query()->paginate();
 
@@ -18,7 +18,7 @@ class RolesController extends Controller
 
     public function store(Request $request)
     {
-        $this->validateRequest($request, $this->storeRequestValidationRules());
+        $this->validateRequest($request);
 
         $roleName = $request->input('name');
         $permissions = $request->input('permissions');
@@ -43,7 +43,7 @@ class RolesController extends Controller
     public function update(Request $request, $id)
     {
         $role = Role::query()->findOrFail($id);
-        $this->validateRequest($request, $this->updateRequestValidationRules($role->id));
+        $this->validateRequest($request);
 
         $name = $request->input('name');
         $permissions = $request->input('permissions');
@@ -63,21 +63,5 @@ class RolesController extends Controller
         $role->delete();
 
         return $this->response->noContent();
-    }
-
-    protected function storeRequestValidationRules()
-    {
-        return [
-            'name'        => 'required|string|unique:admin_roles',
-            'permissions' => 'required|array',
-        ];
-    }
-
-    protected function updateRequestValidationRules($roleId)
-    {
-        return [
-            'name'        => 'required|string|unique:admin_roles,name,'.$roleId,
-            'permissions' => 'required|array',
-        ];
     }
 }

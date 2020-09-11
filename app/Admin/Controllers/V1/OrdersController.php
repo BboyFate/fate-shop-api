@@ -2,17 +2,10 @@
 
 namespace App\Admin\Controllers\V1;
 
+use Illuminate\Http\Request;
 use App\Admin\Resources\OrderResource;
 use App\Models\CrowdfundingProduct;
 use App\Models\Order;
-use App\Services\OrderService;
-use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
-use App\Admin\Models\AdminImage;
-use App\Admin\Resources\ProductResource;
-use App\Models\Product;
-use App\Models\ProductCategory;
-use App\Models\ProductSkuAttribute;
 
 class OrdersController extends Controller
 {
@@ -59,7 +52,7 @@ class OrdersController extends Controller
     public function ship(Request $request, $id)
     {
         $order = Order::query()->findOrFail($id);
-        $this->validateRequest($request, $this->shipRequestValidationRules());
+        $this->validateRequest($request, 'ship');
 
         if (! $order->paid_at) {
             return $this->response->errorBadRequest('未付款的订单不能发货');
@@ -80,13 +73,5 @@ class OrdersController extends Controller
         ]);
 
         return new OrderResource($order);
-    }
-
-    protected function shipRequestValidationRules()
-    {
-        return [
-            'express_company' => 'required',
-            'express_no'      => 'required',
-        ];
     }
 }

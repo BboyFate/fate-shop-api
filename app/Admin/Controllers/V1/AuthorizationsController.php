@@ -18,7 +18,8 @@ class AuthorizationsController extends Controller
      */
     public function store(Request $request)
     {
-        $this->validateRequest($request, $this->authorizationRequestValidationRules());
+        $this->validateRequest($request);
+
         $admin = AdminUser::query()->where([
             'username' => $request->username,
         ])->first();
@@ -78,13 +79,5 @@ class AuthorizationsController extends Controller
             'token_type' => 'Bearer',
             'expires_in' => Auth::factory()->getTTL() * 60 * 60 * 60
         ]);
-    }
-
-    protected function authorizationRequestValidationRules()
-    {
-        return [
-            'username' => 'required|string',
-            'password' => 'required|alpha_dash|min:6',
-        ];
     }
 }

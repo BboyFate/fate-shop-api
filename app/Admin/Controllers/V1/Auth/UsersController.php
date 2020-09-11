@@ -39,7 +39,7 @@ class UsersController extends Controller
      */
     public function store(Request $request)
     {
-        $this->validateRequest($request, $this->storeRequestValidationRules($request->user()->id));
+        $this->validateRequest($request);
 
         $admin = $this->updateOrStoreAdmin($request);
 
@@ -56,7 +56,7 @@ class UsersController extends Controller
     public function update(Request $request, $id)
     {
         $admin = AdminUser::query()->findOrFail($id);
-        $this->validateRequest($request, $this->updateRequestValidationRules($admin->id));
+        $this->validateRequest($request);
 
         $admin = $this->updateOrStoreAdmin($request, false, $admin);
 
@@ -100,37 +100,5 @@ class UsersController extends Controller
         $admin->delete();
 
         return $this->response->noContent();
-    }
-
-    protected function storeRequestValidationRules($userId)
-    {
-        return [
-            'username'        => 'required|string|unique:admin_users',
-            'password'        => 'required|alpha_dash|min:6|confirmed',
-            'nickname'        => 'required|string',
-            'phone'           => [
-                'required',
-                'regex:/^((13[0-9])|(14[5,7])|(15[0-3,5-9])|(17[0,3,5-8])|(18[0-9])|166|198|199)\d{8}$/',
-                'unique:admin_users'
-            ],
-            'avatar_image_id' => 'exists:admin_images,id,type,avatar,admin_user_id,' . $userId,
-            'role'            => 'required|string',
-        ];
-    }
-
-    protected function updateRequestValidationRules($userId)
-    {
-        return [
-            'username'        => 'required|string|unique:admin_users,username,'.$userId,
-            'password'        => 'required|alpha_dash|min:6|confirmed',
-            'nickname'        => 'required|string',
-            'phone'           => [
-                'required',
-                'regex:/^((13[0-9])|(14[5,7])|(15[0-3,5-9])|(17[0,3,5-8])|(18[0-9])|166|198|199)\d{8}$/',
-                'unique:admin_users,phone,'.$userId
-            ],
-            'avatar_image_id' => 'exists:admin_images,id,type,avatar,admin_user_id,' . $userId,
-            'role'            => 'required|string|exists:admin_roles,name',
-        ];
     }
 }

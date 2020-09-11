@@ -68,7 +68,7 @@ class ProductService
 
             $product->category()->associate($productData['category_id']);
 
-            if ($productData['type'] === Product::TYPE_CROWDFUNDING) {
+            if ($product->type === Product::TYPE_CROWDFUNDING) {
                 $product->crowdfunding()->update([
                     'target_amount' => $productData['target_amount'],
                     'end_at'        => $productData['end_at'],
