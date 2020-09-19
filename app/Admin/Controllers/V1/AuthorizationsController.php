@@ -24,7 +24,7 @@ class AuthorizationsController extends Controller
             'username' => $request->username,
         ])->first();
 
-        if (! Hash::check($request->password, $admin->password)) {
+        if (! $admin || ! Hash::check($request->password, $admin->password)) {
             return $this->response->errorUnprocessableEntity('账号或密码错误');
         }
         if ($admin->is_disabled) {

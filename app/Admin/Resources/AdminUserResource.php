@@ -2,6 +2,7 @@
 
 namespace App\Admin\Resources;
 
+use App\Admin\Models\AdminImage;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class AdminUserResource extends JsonResource
@@ -14,6 +15,11 @@ class AdminUserResource extends JsonResource
      */
     public function toArray($request)
     {
-        return parent::toArray($request);
+        $data = parent::toArray($request);
+        $avatar = $this->images(AdminImage::TYPE_AVATAR)->latest()->first()->path ?: config('app.image_admin_avatar');
+
+        $data['avatar'] = config('app.url') . $avatar;
+
+        return $data;
     }
 }

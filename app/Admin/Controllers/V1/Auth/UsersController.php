@@ -30,6 +30,22 @@ class UsersController extends Controller
         return AdminUserResource::collection($admins);
     }
 
+    public function me(Request $request)
+    {
+        return new AdminUserResource($request->user());
+    }
+
+    public function meUpdate(Request $request)
+    {
+        return new AdminUserResource($request->user());
+
+        $this->validateRequest($request);
+
+        $admin = $this->updateOrStoreAdmin($request, false, $admin);
+
+        return new AdminUserResource($admin);
+    }
+
     /**
      * 注册管理员账号
      *

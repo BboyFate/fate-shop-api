@@ -21,7 +21,6 @@ class Product extends Model
         'title',
         'long_title',
         'description',
-        'image',
         'on_sale',
         'rating',
         'sold_count',

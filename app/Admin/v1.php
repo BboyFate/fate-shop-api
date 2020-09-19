@@ -44,6 +44,17 @@ $router->group([
         ]);
 
         $router->group(['namespace' => 'Auth'], function ($router) {
+            $router->get('user', [
+                'uses' => 'UsersController@me',
+                'as' => 'api.v1.admin.user.me'
+            ]);
+            $router->put('user', [
+                'uses' => 'UsersController@meUpdate',
+                'as' => 'api.v1.admin.user.me_update'
+            ]);
+        });
+
+        $router->group(['namespace' => 'Auth'], function ($router) {
             /**
              * 管理员
              */
