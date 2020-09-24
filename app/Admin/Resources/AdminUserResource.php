@@ -15,11 +15,20 @@ class AdminUserResource extends JsonResource
      */
     public function toArray($request)
     {
-        $data = parent::toArray($request);
-        $avatar = $this->images(AdminImage::TYPE_AVATAR)->latest()->first()->path ?: config('app.image_admin_avatar');
+        $role = $this->roles()->first();
+        if ($role) {
+            $roles = [$role->name];
+        } else {
+            $roles = [];
+        }
 
-        $data['avatar'] = config('app.url') . $avatar;
-
-        return $data;
+        return [
+            'id' => $this->id,
+            'username' => $this->username,
+            'nickname' => $this->nickname,
+            'phone' => $this->phone,
+            'avatar' => $this->avatar,
+            'roles' => $roles
+        ];
     }
 }

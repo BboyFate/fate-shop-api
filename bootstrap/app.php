@@ -86,13 +86,14 @@ $app->configure('permission');
 // ]);
 
 $app->routeMiddleware([
-    'auth'          => App\Http\Middleware\Authenticate::class,
-    'random_drop'   => App\Http\Middleware\RandomDropSeckillRequest::class,
-    'accept_header' => App\Http\Middleware\AcceptHeader::class,
-    'admin.guard'   => App\Admin\Middleware\AdminGuardMiddleware::class,
-    'admin.refresh' => App\Admin\Middleware\RefreshAdminTokenMiddleware::class,
-    'permission'    => Spatie\Permission\Middlewares\PermissionMiddleware::class,
-    'role'          => Spatie\Permission\Middlewares\RoleMiddleware::class,
+    'auth'                    => App\Http\Middleware\Authenticate::class,
+    'random_drop'             => App\Http\Middleware\RandomDropSeckillRequest::class,
+    'accept_header'           => App\Http\Middleware\AcceptHeader::class,
+    'admin.guard'             => App\Admin\Middleware\AdminGuardMiddleware::class,
+    'admin.check_permissions' => App\Admin\Middleware\AdminCheckPermissionsMiddleware::class,
+    'admin.refresh'           => App\Admin\Middleware\RefreshAdminTokenMiddleware::class,
+    'permission'              => Spatie\Permission\Middlewares\PermissionMiddleware::class,
+    'role'                    => Spatie\Permission\Middlewares\RoleMiddleware::class,
 ]);
 
 $app->alias('cache', \Illuminate\Cache\CacheManager::class);

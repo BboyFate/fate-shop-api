@@ -36,7 +36,7 @@ $router->group([
     /**
      * 需要登录才能访问的 API
      */
-    $router->group(['middleware' => 'admin.refresh'], function () use ($router) {
+    $router->group(['middleware' => ['admin.refresh', 'admin.check_permissions']], function () use ($router) {
         // 上传图片
         $router->post('images', [
             'uses' => 'ImagesController@store',
@@ -125,6 +125,34 @@ $router->group([
             $router->delete('auth/roles/{role}', [
                 'uses' => 'RolesController@destroy',
                 'as' => 'api.v1.admin.auth.roles.destroy'
+            ]);
+
+            /**
+             * vue 菜单
+             */
+            $router->get('vue_menus', [
+                'uses' => 'VueMenusController@index',
+                'as' => 'api.v1.admin.auth.vue_menus.index'
+            ]);
+            $router->get('vue_menus/{id:[0-9]+}', [
+                'uses' => 'VueMenusController@show',
+                'as' => 'api.v1.admin.auth.vue_menus.show'
+            ]);
+            $router->post('vue_menus', [
+                'uses' => 'VueMenusController@store',
+                'as' => 'api.v1.admin.auth.vue_menus.store'
+            ]);
+            $router->patch('vue_menus/{id:[0-9]+}', [
+                'uses' => 'VueMenusController@update',
+                'as' => 'api.v1.admin.auth.vue_menus.update'
+            ]);
+            $router->delete('vue_menus/{role:[0-9]+}', [
+                'uses' => 'VueMenusController@destroy',
+                'as' => 'api.v1.admin.auth.vue_menus.destroy'
+            ]);
+            $router->get('vue_menus/role_menus', [
+                'uses' => 'VueMenusController@roleMenus',
+                'as' => 'api.v1.admin.auth.vue_menus.role_menus'
             ]);
         });
 

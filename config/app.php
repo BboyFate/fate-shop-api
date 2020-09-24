@@ -118,4 +118,7 @@ return [
     // 默认图片
     'image_admin_avatar' => '/commons/images/admin-avatar.jpg',
     'image_product' => '/commons/images/product.png',
+
+    // 默认超级管理员的角色名称
+    'super_admin_role_name' => 'SuperAdmin',
 ];

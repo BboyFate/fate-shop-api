@@ -21,6 +21,6 @@ class AdminUsersSeeder extends Seeder
             'phone'    => 15625662363,
         ]);
 
-        $superAdmin->assignRole(['super-admin']);
+        $superAdmin->assignRole(config('app.super_admin_role_name'));
     }
 }

@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
 
         $this->call(AdminUsersSeeder::class);
         $this->call(AdminImagesSeeder::class);
+        $this->call(AdminVueMenusSeeder::class);
 
         $this->call(UserAddressesSeeder::class);
         $this->call(ProductCategoriesSeeder::class);

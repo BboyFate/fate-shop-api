@@ -1,7 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Route;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 
@@ -18,13 +19,24 @@ class SeedRolesAndPermissionsData extends Migration
         app(Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
         config(['auth.defaults.guard' => 'admin']);
 
-        Permission::query()->create(['name' => 'manage_admins']);
-        Permission::query()->create(['name' => 'manage_orders']);
+        // 创建一个超级管理员
+        $role = Role::query()->create(['name' => config('app.super_admin_role_name')]);
 
-        // 超级管理员赋所有权限
-        $superAdmin = Role::query()->create(['name' => 'super-admin']);
-        $superAdmin->syncPermissions(Permission::all());
+        $routes = Route::getRoutes();
+        $permissions = [];
+        foreach ($routes as $k => $route) {
+            if (strpos($k, 'admin') !== false) {
+                if (in_array('admin.refresh', $route['action']['middleware'])) {
+                    $permissions[] = [
+                        'name'       => $route['action']['as'],
+                        'guard_name' => 'admin'
+                    ];
+                }
+            }
+        }
+        DB::table(config('permission.table_names.permissions'))->insert($permissions);
 
+        $role->givePermissionTo(Permission::all());
     }
 
     /**

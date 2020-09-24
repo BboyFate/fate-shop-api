@@ -23,9 +23,15 @@ class AdminUser extends Model implements AuthenticatableContract, AuthorizableCo
         'password',
         'nickname',
         'phone',
+        'is_disabled',
+        'last_actived_at',
     ];
 
     protected $dates = ['last_actived_at'];
+
+    protected $casts = [
+        'is_disabled' => true
+    ];
 
     /**
      * The attributes excluded from the model's JSON form.
@@ -36,25 +42,30 @@ class AdminUser extends Model implements AuthenticatableContract, AuthorizableCo
         'password',
     ];
 
-//    public function getFurImageAttribute($field)
-//    {
-//        return $this->attributes[$field] = config('app.url') . $field;
-//    }/**
-// * 访问器-头像链接字段
-// * @param string $value
-// * @return string
-// */
-//public function getAvatarAttribute($value)
-//{
-//    if (empty($value)) {
-//        return 'https://cdn.learnku.com/uploads/images/201709/20/1/PtDKbASVcz.png?imageView2/1/w/600/h/60';
-//    }
-//    return $value;
-//}
+    public function getAvatarAttribute()
+    {
+        $avatar = $this->images(AdminImage::TYPE_AVATAR)->latest()->first()->path;
+        $uri = config('app.url');
+        if (isset($avatar)) {
+            return $uri . $avatar;
+        }
+        return $uri . config('app.image_admin_avatar');
+    }
 
     public function images($type = AdminImage::TYPE_PRODUCT)
     {
         return $this->hasMany(AdminImage::class)->where('type', $type);
+    }
+
+    public function roles()
+    {
+        return $this->morphToMany(
+            AdminRole::class,
+            'model',
+            config('permission.table_names.model_has_roles'),
+            config('permission.column_names.model_morph_key'),
+            'role_id'
+        );
     }
 
     /**

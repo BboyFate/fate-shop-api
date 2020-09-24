@@ -10,6 +10,7 @@ class RolesValidation
             'rules' => [
                 'name'        => 'required|string|unique:admin_roles',
                 'permissions' => 'required|array',
+                'menu_ids'    => 'array',
             ]
         ];
     }
@@ -20,6 +21,7 @@ class RolesValidation
             'rules' => [
                 'name'        => 'required|string|unique:admin_roles,name,'. request()->route('id'),
                 'permissions' => 'required|array',
+                'menu_ids'    => 'array',
             ]
         ];
     }
