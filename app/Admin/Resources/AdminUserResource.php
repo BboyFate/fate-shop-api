@@ -2,7 +2,6 @@
 
 namespace App\Admin\Resources;
 
-use App\Admin\Models\AdminImage;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class AdminUserResource extends JsonResource
@@ -23,12 +22,15 @@ class AdminUserResource extends JsonResource
         }
 
         return [
-            'id' => $this->id,
-            'username' => $this->username,
-            'nickname' => $this->nickname,
-            'phone' => $this->phone,
-            'avatar' => $this->avatar,
-            'roles' => $roles
+            'id'          => $this->id,
+            'username'    => $this->username,
+            'nickname'    => $this->nickname,
+            'is_enabled' => $this->is_enabled,
+            'phone'       => $this->phone,
+            'avatar'      => $this->avatar,
+            'roles'       => $roles,
+            'created_at'  => $this->created_at->toDateTimeString(),
+            'updated_at'  => $this->updated_at->toDateTimeString(),
         ];
     }
 }

@@ -6,15 +6,16 @@ use App\Admin\Services\VueMenuService;
 use Illuminate\Http\Request;
 use App\Admin\Models\AdminVueMenu;
 use App\Admin\Controllers\V1\Controller;
+use App\Admin\Resources\AdminVueMenuCollection;
 use App\Admin\Resources\AdminVueMenuResource;
 
 class VueMenusController extends Controller
 {
-    public function index(Request $request, VueMenuService $service)
+    public function index(VueMenuService $service)
     {
-        $menus = $service->getMenuTree(null, AdminVueMenu::query()->get());
-       // return new AdminVueMenuResource($menus);
-        return AdminVueMenuResource::collection($menus);
+        $menus = AdminVueMenu::query()->get();
+
+        return $this->response->success(new AdminVueMenuCollection($menus));
     }
 
     public function store(Request $request)
@@ -22,10 +23,12 @@ class VueMenusController extends Controller
         $this->validateRequest($request, 'requestValidation');
 
         $menu = new AdminVueMenu([
-            'name'     => $request->input('name'),
-            'path'     => $request->input('path'),
-            'meta'     => $request->input('meta'),
-            'redirect' => $request->input('redirect', ''),
+            'name'      => $request->input('name'),
+            'path'      => $request->input('path'),
+            'meta'      => $request->input('meta'),
+            'redirect'  => $request->input('redirect', ''),
+            'is_showed' => $request->input('is_showed'),
+            'component' => $request->input('component'),
         ]);
 
         if ($request->input('parent_id')) {
@@ -34,14 +37,14 @@ class VueMenusController extends Controller
 
         $menu->save();
 
-        return new AdminVueMenuResource($menu);
+        return $this->response->created(new AdminVueMenuResource($menu));
     }
 
     public function show($id)
     {
         $menu = AdminVueMenu::query()->findOrFail($id);
 
-        return new AdminVueMenuResource($menu);
+        return $this->response->success(new AdminVueMenuResource($menu));
     }
 
     public function update(Request $request, $id)
@@ -50,13 +53,15 @@ class VueMenusController extends Controller
         $this->validateRequest($request, 'requestValidation');
 
         $menu->update([
-            'name'     => $request->input('name'),
-            'path'     => $request->input('path'),
-            'meta'     => $request->input('meta'),
-            'redirect' => $request->input('redirect', ''),
+            'name'      => $request->input('name'),
+            'path'      => $request->input('path'),
+            'meta'      => $request->input('meta'),
+            'redirect'  => $request->input('redirect', ''),
+            'is_showed' => $request->input('is_showed'),
+            'component' => $request->input('component'),
         ]);
 
-        return new AdminVueMenuResource($menu);
+        return $this->response->success(new AdminVueMenuResource($menu));
     }
 
     public function destroy($id)
@@ -67,12 +72,14 @@ class VueMenusController extends Controller
         return $this->response->noContent();
     }
 
-    public function roleMenus(Request $request, VueMenuService $service)
+    public function roleMenus(Request $request)
     {
-        $menus = $request->user()->roles()->first()->vueMenus()->get();
+        if ($request->user()->isAdmin()) {
+            $menus = AdminVueMenu::query()->get();
+        } else {
+            $menus = $request->user()->roles()->first()->vueMenus()->get();
+        }
 
-        $menus = $service->getMenuTree(null, $menus);
-
-        return AdminVueMenuResource::collection($menus);
+        return $this->response->success(new AdminVueMenuCollection($menus));
     }
 }

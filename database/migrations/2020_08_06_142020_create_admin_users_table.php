@@ -20,7 +20,7 @@ class CreateAdminUsersTable extends Migration
             $table->string('nickname');
             $table->char('phone', 11)->unique()->nullable();
             $table->string('avatar')->nullable();
-            $table->boolean('is_disabled')->default(false)->comment('默认允许登录');
+            $table->boolean('is_enabled')->default(true)->comment('默认允许登录');
             $table->dateTime('created_at');
             $table->dateTime('updated_at');
             $table->dateTime('last_actived_at')->nullable();

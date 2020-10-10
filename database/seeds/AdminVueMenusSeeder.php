@@ -14,27 +14,45 @@ class AdminVueMenusSeeder extends Seeder
     {
         $menus = [
             [
-                'name' => 'Nested',
-                'path' => '/nested',
-                'redirect' => '/nested/menu1/menu1-1',
-                'component' => 'nested',
+                'name' => 'Auth',
+                'path' => '/auth',
+                'component' => 'Layout',
                 'meta' => [
-                    'icon' => 'nested'
+                    'icon' => 'lock',
+                    'title' => '权限管理'
                 ],
                 'children' => [
                     [
-                        'name' => 'Menu1',
-                        'path' => 'menu1',
-                        'redirect' => '/nested/menu1/menu1-1',
-                        'component' => 'nested',
-                        'meta' => [],
+                        'name' => 'Admin',
+                        'path' => 'admin',
+                        'component' => 'Admin',
+                        'meta' => [
+                            'title' => '管理员'
+                        ],
                     ],
                     [
-                        'name' => 'Menu2',
-                        'path' => 'menu2',
-                        'redirect' => '/nested/menu1/menu1-2',
-                        'component' => 'nested',
-                        'meta' => [],
+                        'name' => 'Role',
+                        'path' => 'role',
+                        'component' => 'Role',
+                        'meta' => [
+                            'title' => '角色'
+                        ],
+                    ],
+                    [
+                        'name' => 'Permission',
+                        'path' => 'permission',
+                        'component' => 'Permission',
+                        'meta' => [
+                            'title' => '权限'
+                        ],
+                    ],
+                    [
+                        'name' => 'VueMenu',
+                        'path' => 'vue_menu',
+                        'component' => 'VueMenu',
+                        'meta' => [
+                            'title' => 'Vue 菜单'
+                        ],
                     ],
                 ]
             ]
@@ -50,7 +68,6 @@ class AdminVueMenusSeeder extends Seeder
         $menu = new AdminVueMenu([
             'name'      => $data['name'],
             'path'      => $data['path'],
-            'redirect'  => $data['redirect'],
             'meta'      => $data['meta'],
             'component' => $data['component'],
         ]);

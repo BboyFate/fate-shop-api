@@ -27,7 +27,27 @@ class ProductCategoriesController extends Controller
 
         $users = $builder->paginate();
 
-        return ProductCategoryResource::collection($users);
+        return $this->response->success(ProductCategoryResource::collection($users));
+    }
+
+    /**
+     * 搜索一些分类
+     */
+    public function some(Request $request)
+    {
+        $search = $request->input('search');
+        $result = ProductCategory::query()
+            // 通过 is_directory 参数来控制
+            ->where('is_directory', boolval($request->input('is_directory', true)))
+            ->where('name', 'like', '%'.$search.'%')
+            ->get();
+
+        // 把查询出来的结果重新组装成 Laravel-Admin 需要的格式
+        $result = $result->map(function (ProductCategory $category) {
+            return ['id' => $category->id, 'name' => $category->full_name];
+        });
+
+        return $this->response->success($result);
     }
 
     public function store(Request $request)
@@ -65,7 +85,7 @@ class ProductCategoriesController extends Controller
             return $category;
         });
 
-        return new ProductCategoryResource($category);
+        return $this->response->created(new ProductCategoryResource($category));
     }
 
     public function update(Request $request, $id)
@@ -94,7 +114,7 @@ class ProductCategoriesController extends Controller
             return $category;
         });
 
-        return new ProductCategoryResource($category);
+        return $this->response->success(new ProductCategoryResource($category));
     }
 
     public function destroy($id)

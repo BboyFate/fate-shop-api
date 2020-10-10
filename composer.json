@@ -6,6 +6,7 @@
     "type": "project",
     "require": {
         "php": "^7.2",
+        "doctrine/dbal": "^2.11",
         "elasticsearch/elasticsearch": "~7.0",
         "illuminate/redis": "^6.18.31",
         "intervention/image": "^2.5",

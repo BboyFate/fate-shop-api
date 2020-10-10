@@ -19,6 +19,8 @@ class AdminRoleResource extends JsonResource
             'name'        => $this->name,
             'created_at'  => $this->created_at->toDateTimeString(),
             'updated_at'  => $this->updated_at->toDateTimeString(),
+            'vue_menus'   => new AdminVueMenuCollection($this->whenLoaded('vueMenus')),
+            'permissions' => new AdminPermissionResource($this->whenLoaded('permissions')),
         ];
     }
 }

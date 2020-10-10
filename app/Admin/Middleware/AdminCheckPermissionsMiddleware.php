@@ -27,7 +27,7 @@ class AdminCheckPermissionsMiddleware
         $routeName = $request->route()[1]['as'];
 
         $permission = Permission::query()->where('name', $routeName)->first();
-        if (! $permission || ! $user->hasPermissionTo($permission->id)) {
+        if (! $permission || ! $user->hasPermissionTo($permission)) {
             (new Response())->errorForbidden();
         }
 

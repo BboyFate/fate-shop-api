@@ -23,13 +23,13 @@ class UsersController extends Controller
 
         $users = $builder->paginate();
 
-        return UserResource::collection($users);
+        return $this->response->success(UserResource::collection($users));
     }
 
     public function show($id)
     {
         $user = User::query()->findOrFail($id);
 
-        return new UserResource($user);
+        return $this->response->success(new UserResource($user));
     }
 }

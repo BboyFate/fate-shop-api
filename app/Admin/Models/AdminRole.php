@@ -15,6 +15,4 @@ class AdminRole extends Role
             'menu_id'
         );
     }
-
-
 }

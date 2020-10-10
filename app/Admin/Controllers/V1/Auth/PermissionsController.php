@@ -9,11 +9,17 @@ use App\Admin\Resources\AdminPermissionResource;
 
 class PermissionsController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $roles = Permission::query()->paginate();
+        $builder = Permission::query();
 
-        return AdminPermissionResource::collection($roles);
+        if ($limit = $request->input('limit')) {
+            $permissions = $builder->paginate($limit);
+        } else {
+            $permissions = $builder->get();
+        }
+
+        return $this->response->success(AdminPermissionResource::collection($permissions));
     }
 
     public function store(Request $request)
@@ -22,7 +28,7 @@ class PermissionsController extends Controller
 
         $permission = Permission::create(['name' => $request->input('name')]);
 
-        return new AdminPermissionResource($permission);
+        return $this->response->success(new AdminPermissionResource($permission));
     }
 
     /**
@@ -30,13 +36,13 @@ class PermissionsController extends Controller
      *
      * @param $id
      *
-     * @return AdminUserResource|void
+     * @return \Illuminate\Http\JsonResponse
      */
     public function show($id)
     {
         $permission = Permission::query()->findOrFail($id);
 
-        return new AdminPermissionResource($permission);
+        return $this->response->success(new AdminPermissionResource($permission));
     }
 
     public function update(Request $request, $id)
@@ -46,7 +52,7 @@ class PermissionsController extends Controller
 
         $permission->update(['name' => $request->input('name')]);
 
-        return new AdminPermissionResource($permission);
+        return $this->response->success(new AdminPermissionResource($permission));
     }
 
     public function destroy($id)

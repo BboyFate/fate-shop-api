@@ -3,6 +3,7 @@
 namespace App\Admin\Services;
 
 use App\Admin\Models\AdminVueMenu;
+use App\Admin\Resources\AdminVueMenuResource;
 
 class VueMenuService
 {
@@ -23,13 +24,26 @@ class VueMenuService
             ->where('parent_id', $parentId)
             ->map(function (AdminVueMenu $menu) use ($allMenus) {
 
-                if ($menu->level != 0) {
-                    return $menu;
+                $data = new AdminVueMenuResource($menu);
+
+                $hasChildren = $allMenus->contains('parent_id', $menu->id);
+                if ($hasChildren) {
+                    $data['children_array'] = $this->getMenuTree($menu->id, $allMenus)->toArray();
                 }
 
-                $menu['children'] = $this->getMenuTree($menu->id, $allMenus);
+                return $data;
 
-                return $menu;
+
+
+//                $data = new AdminVueMenuResource($menu);
+//
+//                if ($menu->level != 0) {
+//                    return $data;
+//                }
+//
+//                $data['children_array'] = $this->getMenuTree($menu->id, $allMenus)->toArray();
+//
+//                return $data;
             });
     }
 }

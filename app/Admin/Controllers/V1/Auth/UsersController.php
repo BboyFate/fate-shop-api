@@ -14,6 +14,7 @@ class UsersController extends Controller
     public function index(Request $request)
     {
         $builder = AdminUser::query();
+        $limit = $request->input('limit', 15);
 
         // 关键词搜索
         if ($search = $request->input('search', '')) {
@@ -25,14 +26,14 @@ class UsersController extends Controller
             });
         }
 
-        $admins = $builder->paginate();
+        $admins = $builder->paginate($limit);
 
-        return AdminUserResource::collection($admins);
+        return $this->response->success(AdminUserResource::collection($admins));
     }
 
     public function me(Request $request)
     {
-        return new AdminUserResource($request->user());
+        return $this->response->success(new AdminUserResource($request->user()));
     }
 
     public function meUpdate(Request $request)
@@ -43,30 +44,23 @@ class UsersController extends Controller
 
         $admin = $this->updateOrStoreAdmin($request, false, $admin);
 
-        return new AdminUserResource($admin);
+        return $this->response->success(new AdminUserResource($admin));
     }
 
-    /**
-     * 注册管理员账号
-     *
-     * @param Request $request
-     *
-     * @return AdminUserResource
-     */
     public function store(Request $request)
     {
         $this->validateRequest($request);
 
         $admin = $this->updateOrStoreAdmin($request);
 
-        return new AdminUserResource($admin);
+        return $this->response->created(new AdminUserResource($admin));
     }
 
     public function show($id)
     {
         $admin = AdminUser::query()->findOrFail($id);
 
-        return new AdminUserResource($admin);
+        return $this->response->success(new AdminUserResource($admin));
     }
 
     public function update(Request $request, $id)
@@ -76,7 +70,7 @@ class UsersController extends Controller
 
         $admin = $this->updateOrStoreAdmin($request, false, $admin);
 
-        return new AdminUserResource($admin);
+        return $this->response->success(new AdminUserResource($admin));
     }
 
     protected function updateOrStoreAdmin(Request $request, $isStore = true, $admin = null)
@@ -85,22 +79,26 @@ class UsersController extends Controller
             'username',
             'nickname',
             'phone',
+            'is_enabled',
         ]);
-        $attributes['password'] = Hash::make($request->input('password'));
+
+        if ($request->input('password')) {
+            $attributes['password'] = Hash::make($request->input('password'));
+        }
 
         if ($request->avatar_image_id) {
             $image = AdminImage::query()->find($request->avatar_image_id);
             $attributes['avatar'] = $image->path;
         }
 
-        $role = $request->input('role');
+        $roles = $request->input('roles');
 
-        $admin = \DB::transaction(function () use ($attributes, $role, $isStore, $admin) {
+        $admin = \DB::transaction(function () use ($attributes, $roles, $isStore, $admin) {
             if ($isStore) {
                 $admin = AdminUser::query()->create($attributes);
-                $admin->assignRole($role);
+                $admin->assignRole($roles);
             } else {
-                $admin->syncRoles($role);
+                $admin->syncRoles($roles);
                 $admin->update($attributes);
             }
 

@@ -27,13 +27,13 @@ class UserAddressesController extends Controller
 
         $users = $builder->paginate();
 
-        return UserAddressResource::collection($users);
+        return $this->response->success(UserAddressResource::collection($users));
     }
 
     public function show($id)
     {
         $user = UserAddress::query()->findOrFail($id);
 
-        return new UserAddressResource($user);
+        return $this->response->success(new UserAddressResource($user));
     }
 }

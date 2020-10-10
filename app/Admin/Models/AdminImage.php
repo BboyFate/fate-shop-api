@@ -2,6 +2,8 @@
 
 namespace App\Admin\Models;
 
+use Intervention\Image\Facades\Image;
+
 class AdminImage extends Model
 {
     const TYPE_PRODUCT = 'product';
@@ -16,5 +18,10 @@ class AdminImage extends Model
     public function adminUser()
     {
         return $this->belongsTo(AdminUser::class);
+    }
+
+    public function getDataUrlAttribute()
+    {
+        return (string) Image::make(base_path('public') . $this->path)->encode('data-url');
     }
 }

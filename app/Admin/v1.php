@@ -245,6 +245,10 @@ $router->group([
                 'uses' => 'ProductCategoriesController@index',
                 'as' => 'api.v1.admin.product_categories.index'
             ]);
+            $router->get('product_categories/some', [
+                'uses' => 'ProductCategoriesController@some',
+                'as' => 'api.v1.admin.product_categories.some'
+            ]);
             $router->get('product_categories/{id:[0-9]+}', [
                 'uses' => 'ProductCategoriesController@show',
                 'as' => 'api.v1.admin.product_categories.show'
@@ -278,6 +282,10 @@ $router->group([
             $router->patch('orders/{order:[0-9]+}/ship', [
                 'uses' => 'OrdersController@ship',
                 'as' => 'api.v1.admin.orders.ship'
+            ]);
+            $router->patch('orders/{order:[0-9]+}/refund', [
+                'uses' => 'OrdersController@refund',
+                'as' => 'api.v1.admin.orders.refund'
             ]);
         });
 

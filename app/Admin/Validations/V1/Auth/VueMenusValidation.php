@@ -8,15 +8,18 @@ class VueMenusValidation
 {
     public function requestValidation()
     {
+        $currentMenuId = request()->id;
+
         $rules = [
-            'name'     => 'required|string|unique:admin_vue_menus',
-            'path'     => 'required|string',
-            'redirect' => 'string',
-            'meta'     => 'array',
+            'path'      => 'required|string',
+            'redirect'  => 'nullable|string',
+            'meta'      => 'array',
+            'is_showed' => 'required|boolean',
         ];
 
         switch (request()->method()) {
             case 'POST':
+                $rules['name'] = 'required|string|unique:admin_vue_menus';
                 $rules['parent_id'] = [
                     'integer',
                     function ($attribute, $value, $fail) {
@@ -28,7 +31,7 @@ class VueMenusValidation
                 break;
 
             case 'PATCH':
-
+                $rules['name'] = 'required|string|unique:admin_vue_menus,name,' . $currentMenuId;
         }
 
         return [

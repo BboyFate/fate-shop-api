@@ -14,14 +14,22 @@ class AdminVueMenuResource extends JsonResource
      */
     public function toArray($request)
     {
-        return [
+        $data = [
             'id'        => $this->id,
+            'parent_id' => $this->parent_id,
             'name'      => $this->name,
             'path'      => $this->path,
             'redirect'  => $this->redirect,
-            'meta'      => $this->meta,
             'component' => $this->component,
-            'children'  => AdminVueMenuResource::collection($this->children)
+            'meta'      => $this->meta,
+            'sorted'    => $this->sorted,
+            'is_showed' => $this->is_showed,
         ];
+
+        if (isset($this->children_array)) {
+            $data['children'] = $this->children_array;
+        }
+
+        return $data;
     }
 }

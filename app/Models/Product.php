@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Admin\Models\AdminImage;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
@@ -58,6 +59,11 @@ class Product extends Model
         return $this->hasOne(SeckillProduct::class);
     }
 
+    public function images($type = AdminImage::TYPE_PRODUCT)
+    {
+        return $this->hasMany(AdminImage::class, 'id', 'admin_image_id')->where('type', $type);
+    }
+
     /**
      * 访问器
      * 图片的绝对路径
@@ -66,11 +72,12 @@ class Product extends Model
      */
     public function getImageUrlAttribute()
     {
-        // 如果 image 字段本身就已经是完整的 url 就直接返回
-        if (Str::startsWith($this->attributes['image'], ['http://', 'https://'])) {
-            return $this->attributes['image'];
+        if ($image = $this->images()->latest()->first()) {
+            $imagePath = $image->path;
+        } else {
+            $imagePath = config('app.image_admin_avatar');
         }
-        return \Storage::disk('public')->url($this->attributes['image']);
+        return config('app.url') . $imagePath;
     }
 
     /**

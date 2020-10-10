@@ -70,7 +70,7 @@ abstract class CommonProductsController extends Controller
             'path' => route('api.v1.admin.products.index', false)
         ]);
 
-        return ProductResource::collection($pager);
+        return $this->response->success(ProductResource::collection($pager));
     }
 
     public function store(Request $request, ProductService $service)
@@ -95,32 +95,14 @@ abstract class CommonProductsController extends Controller
 
         $product = $service->store($productData);
 
-        return new ProductResource($product);
+        return $this->response->created(new ProductResource($product));
     }
 
-    public function update(Request $request, $id, ProductService $service)
+    public function show($id)
     {
-        $product = Product::query()->findOrFail($id);
-        $this->validateRequest($request, 'requestValidation');
+        $product = Product::query()->with(['category'])->findOrFail($id);
 
-        $image = AdminImage::query()->find($request->product_image_id);
-
-        $productData = $request->only([
-            'title',
-            'long_title',
-            'description',
-            'on_sale',
-            'category_id',
-        ]);
-        $productData['image'] = $image->path;
-        $productData['skus'] = $request->input('skus');
-        $productData['properties'] = $request->input('properties');
-
-        $productData = array_merge($productData, $this->customForm($request));
-
-        $product = $service->update($product, $productData);
-
-        return new ProductResource($product);
+        return $this->response->success(new ProductResource($product));
     }
 
     abstract protected function customForm(Request $request);

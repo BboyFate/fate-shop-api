@@ -16,10 +16,13 @@ class AdminVueMenu extends Model
         'meta',
         'str_ids',
         'level',
+        'is_showed',
+        'component',
     ];
 
     protected $casts = [
         'meta' => 'json',
+        'is_showed' => 'boolean',
     ];
 
     protected static function boot()
@@ -79,5 +82,10 @@ class AdminVueMenu extends Model
     public function children()
     {
         return $this->hasMany(AdminVueMenu::class, 'parent_id');
+    }
+
+    public function scopeIsShowed($query)
+    {
+        return $query->where('is_showed', true);
     }
 }

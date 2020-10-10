@@ -23,14 +23,14 @@ class AdminUser extends Model implements AuthenticatableContract, AuthorizableCo
         'password',
         'nickname',
         'phone',
-        'is_disabled',
+        'is_enabled',
         'last_actived_at',
     ];
 
     protected $dates = ['last_actived_at'];
 
     protected $casts = [
-        'is_disabled' => true
+        'is_enabled' => 'boolean'
     ];
 
     /**
@@ -44,12 +44,12 @@ class AdminUser extends Model implements AuthenticatableContract, AuthorizableCo
 
     public function getAvatarAttribute()
     {
-        $avatar = $this->images(AdminImage::TYPE_AVATAR)->latest()->first()->path;
-        $uri = config('app.url');
-        if (isset($avatar)) {
-            return $uri . $avatar;
+        if ($image = $this->images(AdminImage::TYPE_AVATAR)->latest()->first()) {
+            $avatar = $image->path;
+        } else {
+            $avatar = config('app.image_admin_avatar');
         }
-        return $uri . config('app.image_admin_avatar');
+        return config('app.url') . $avatar;
     }
 
     public function images($type = AdminImage::TYPE_PRODUCT)
@@ -86,5 +86,13 @@ class AdminUser extends Model implements AuthenticatableContract, AuthorizableCo
     public function getJWTCustomClaims()
     {
         return [];
+    }
+
+    public function isAdmin()
+    {
+        if ($this->hasRole(config('app.super_admin_role_name'))) {
+            return true;
+        }
+        return false;
     }
 }

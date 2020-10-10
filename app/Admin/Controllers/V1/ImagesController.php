@@ -23,6 +23,6 @@ class ImagesController extends Controller
         $image->admin_user_id = $user->id;
         $image->save();
 
-        return new ImageResource($image);
+        return $this->response->success((new ImageResource($image))->showDataUrlField());
     }
 }
