@@ -4,7 +4,7 @@ namespace App\Admin\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ImageResource extends JsonResource
+class SystemImageResource extends JsonResource
 {
     /**
      * 默认隐藏显示图片流字段

@@ -4,9 +4,9 @@ namespace App\Admin\Controllers\V1;
 
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
-use App\Admin\Models\AdminImage;
 use App\Admin\Resources\ProductResource;
 use App\Models\Product;
+use App\Models\ProductSku;
 use App\Models\ProductCategory;
 use App\SearchBuilders\ProductSearchBuilder;
 use App\Services\ProductService;
@@ -18,8 +18,8 @@ abstract class CommonProductsController extends Controller
     public function index(Request $request)
     {
         $page = $request->input('page', 1);
-        $perPage = 16;
-        $builder = (new ProductSearchBuilder())->productType($this->getProductType())->paginate($perPage, $page);
+        $perPage = $request->input('limit', 10);
+        $builder = (new ProductSearchBuilder())->productType($this->getProductType())->paginate((int) $perPage, (int) $page);
 
         // 排序
         if ($order = $request->input('order', '')) {
@@ -30,6 +30,12 @@ abstract class CommonProductsController extends Controller
                     $builder->orderBy($m[1], $m[2]);
                 }
             }
+        }
+
+        // 是否上架
+        $onSale = $request->input('on_sale');
+        if ($onSale != '' && isset($onSale)) {
+            $builder->onSale((boolean) $onSale);
         }
 
         // 商品类目
@@ -52,7 +58,7 @@ abstract class CommonProductsController extends Controller
         $result = app('es')->search($builder->getParams());
 
         $productIds = collect($result['hits']['hits'])->pluck('_id')->all();
-        $products = Product::query()->byIds($productIds)->get();
+        $products = Product::query()->with(['crowdfunding', 'category'])->byIds($productIds)->get();
 
         $properties = [];
         // 如果返回结果里有 aggregations 字段，说明做了分面搜索
@@ -66,7 +72,13 @@ abstract class CommonProductsController extends Controller
                 });
         }
 
-        $pager = new LengthAwarePaginator($products, $result['hits']['total']['value'], $perPage, $page, [
+        // 商品类型的总数量
+        $totalParams = (new ProductSearchBuilder())
+            ->productType($this->getProductType())
+            ->getParams();
+        $total = app('es')->count($totalParams);
+
+        $pager = new LengthAwarePaginator($products, $total['count'], $perPage, $page, [
             'path' => route('api.v1.admin.products.index', false)
         ]);
 
@@ -77,7 +89,34 @@ abstract class CommonProductsController extends Controller
     {
         $this->validateRequest($request, 'requestValidation');
 
-        $image = AdminImage::query()->find($request->product_image_id);
+        $productData = $request->only([
+            'title',
+            'long_title',
+            'description',
+            'on_sale',
+            'category_id',
+            'image',
+            'sku_attributes',
+            'skus',
+        ]);
+        $productData['type'] = $this->getProductType();
+        $productData['banners'] = $request->input('banners', []);
+        $productData['properties'] = $request->input('properties', []);
+
+        $productData = array_merge($productData, $this->customForm($request));
+
+        $product = $service->store($productData);
+
+        $product->load('category', 'skus', 'skuAttributes', 'crowdfunding');
+
+        return $this->response->created(new ProductResource($product));
+    }
+
+    public function update(Request $request, $id, ProductService $service)
+    {
+        $product = Product::query()->with(['category', 'skus', 'skuAttributes', 'crowdfunding'])->findOrFail($id);
+
+        $this->validateRequest($request, 'requestValidation');
 
         $productData = $request->only([
             'title',
@@ -85,22 +124,26 @@ abstract class CommonProductsController extends Controller
             'description',
             'on_sale',
             'category_id',
+            'image',
+            'sku_attributes',
+            'skus',
         ]);
-        $productData['image'] = $image->path;
         $productData['type'] = $this->getProductType();
-        $productData['skus'] = $request->input('skus');
-        $productData['properties'] = $request->input('properties');
+        $productData['banners'] = $request->input('banners', []);
+        $productData['properties'] = $request->input('properties', []);
 
         $productData = array_merge($productData, $this->customForm($request));
 
-        $product = $service->store($productData);
+        $product = $service->update($product, $productData);
 
-        return $this->response->created(new ProductResource($product));
+        $product->load('category', 'skus', 'skuAttributes');
+
+        return $this->response->success(new ProductResource($product));
     }
 
     public function show($id)
     {
-        $product = Product::query()->with(['category'])->findOrFail($id);
+        $product = Product::query()->with(['category', 'skus', 'skuAttributes', 'crowdfunding'])->findOrFail($id);
 
         return $this->response->success(new ProductResource($product));
     }
@@ -114,4 +157,22 @@ abstract class CommonProductsController extends Controller
 
         return $this->response->noContent();
     }
+
+    public function skuDestroy($id)
+    {
+        $sku = ProductSku::query()->findOrFail($id);
+        $sku->delete();
+
+        return $this->response->noContent();
+    }
+
+    public function skusDestroy(Request $request)
+    {
+        $this->validateRequest($request);
+
+        ProductSku::destroy($request->input('sku_ids'));
+
+        return $this->response->noContent();
+    }
+
 }

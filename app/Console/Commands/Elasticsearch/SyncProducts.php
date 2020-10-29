@@ -22,7 +22,7 @@ class SyncProducts extends Command
 
         Product::query()
             // 预加载 SKU 和 商品属性数据，避免 N + 1 问题
-            ->with(['skus', 'properties'])
+            ->with(['skus', 'properties', 'description'])
             // 使用 chunkById 避免一次性加载过多数据
             ->chunkById(100, function ($products) use ($es) {
                 $this->info(sprintf('正在同步 ID 范围为 %s 至 %s 的商品', $products->first()->id, $products->last()->id));

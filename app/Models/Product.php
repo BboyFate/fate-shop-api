@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
-use App\Admin\Models\AdminImage;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Product extends Model
 {
+    use SoftDeletes;
+
     const TYPE_NORMAL       = 'normal';
     const TYPE_CROWDFUNDING = 'crowdfunding';
     const TYPE_SECKILL      = 'seckill';
@@ -19,19 +20,21 @@ class Product extends Model
     ];
 
     protected $fillable = [
+        'type',
         'title',
         'long_title',
-        'description',
+        'image',
+        'banners',
         'on_sale',
         'rating',
         'sold_count',
         'review_count',
         'price',
-        'type',
     ];
 
     protected $casts = [
         'on_sale' => 'boolean',
+        'banners' => 'array',
     ];
 
     public function category()
@@ -39,9 +42,19 @@ class Product extends Model
         return $this->belongsTo(ProductCategory::class);
     }
 
+    public function description()
+    {
+        return $this->hasOne(ProductDescription::class);
+    }
+
     public function skus()
     {
         return $this->hasMany(ProductSku::class);
+    }
+
+    public function skuAttributes()
+    {
+        return $this->hasMany(ProductSkuAttribute::class);
     }
 
     public function properties()
@@ -57,27 +70,6 @@ class Product extends Model
     public function seckill()
     {
         return $this->hasOne(SeckillProduct::class);
-    }
-
-    public function images($type = AdminImage::TYPE_PRODUCT)
-    {
-        return $this->hasMany(AdminImage::class, 'id', 'admin_image_id')->where('type', $type);
-    }
-
-    /**
-     * 访问器
-     * 图片的绝对路径
-     *
-     * @return mixed
-     */
-    public function getImageUrlAttribute()
-    {
-        if ($image = $this->images()->latest()->first()) {
-            $imagePath = $image->path;
-        } else {
-            $imagePath = config('app.image_admin_avatar');
-        }
-        return config('app.url') . $imagePath;
     }
 
     /**
@@ -129,10 +121,10 @@ class Product extends Model
         // 类目的 path 字段
         $arr['category_path'] = $this->category ? $this->category->path : '';
         // strip_tags 函数可以将 html 标签去除
-        $arr['description'] = strip_tags($this->description);
+        $arr['description'] = strip_tags($this->description ? $this->description->description : '');
         // 只取出需要的 SKU 字段
         $arr['skus'] = $this->skus->map(function (ProductSku $sku) {
-            return Arr::only($sku->toArray(), ['name', 'description', 'price']);
+            return Arr::only($sku->toArray(), ['name', 'price']);
         });
         // 只取出需要的商品属性字段
         $arr['properties'] = $this->properties->map(function (ProductProperty $property) {
@@ -140,7 +132,6 @@ class Product extends Model
                 'search_value' => $property->name . ':' . $property->value
             ]);
         });
-
         return $arr;
     }
 }

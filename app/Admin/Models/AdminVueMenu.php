@@ -21,7 +21,7 @@ class AdminVueMenu extends Model
     ];
 
     protected $casts = [
-        'meta' => 'json',
+        'meta'      => 'json',
         'is_showed' => 'boolean',
     ];
 

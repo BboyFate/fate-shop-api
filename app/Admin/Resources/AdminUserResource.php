@@ -27,7 +27,6 @@ class AdminUserResource extends JsonResource
             'nickname'    => $this->nickname,
             'is_enabled' => $this->is_enabled,
             'phone'       => $this->phone,
-            'avatar'      => $this->avatar,
             'roles'       => $roles,
             'created_at'  => $this->created_at->toDateTimeString(),
             'updated_at'  => $this->updated_at->toDateTimeString(),

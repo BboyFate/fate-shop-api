@@ -2,11 +2,17 @@
 
 namespace App\Models;
 
-use App\Exceptions\InternalException;
+use App\Exceptions\InvalidRequestException;
 
 class ProductSku extends Model
 {
-    protected $fillable = ['name', 'description', 'price', 'stock', 'attributes'];
+    protected $fillable = [
+        'name',
+        'image',
+        'price',
+        'stock',
+        'attributes'
+    ];
 
     protected $casts = [
         'attributes' => 'array',
@@ -20,14 +26,14 @@ class ProductSku extends Model
     /**
      * 减库存 返回影响的行数
      *
-     * @param int $amount 库存
+     * @param $amount 要减的库存量
      * @return mixed
-     * @throws InternalException
+     * @throws InvalidRequestException
      */
     public function decreaseStock($amount)
     {
         if ($amount < 0) {
-            throw new InternalException('减库存不可小于 0');
+            throw new InvalidRequestException('减库存不可小于 0', 500);
         }
 
         return $this->where('id', $this->id)
@@ -38,14 +44,14 @@ class ProductSku extends Model
     /**
      * 增加库存
      *
-     * @param int $amount 库存
+     * @param $amount 要增的库存量
      * @return int
-     * @throws InternalException
+     * @throws InvalidRequestException
      */
     public function addStock($amount)
     {
         if ($amount < 0) {
-            throw new InternalException('加库存不可小于 0');
+            throw new InvalidRequestException('加库存不可小于 0', 500);
         }
 
         return $this->increment('stock', $amount);

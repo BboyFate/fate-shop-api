@@ -36,13 +36,15 @@ class ImageUploadHandler
 
         // 如果限制了图片宽度，就进行裁剪
         if ($maxWidth && $extension != 'gif') {
-
             // 此类中封装的函数，用于裁剪图片
             $this->reduceSize($uploadPath . '/' . $filename, $maxWidth);
         }
 
         return [
-            'path' => "/$folderName/$filename"
+            'path' => config('app.url') . "/$folderName/$filename",
+            'name' => $filename,
+            'mime' => $file->getClientMimeType(),
+            'size' => $file->getClientSize(),
         ];
     }
 

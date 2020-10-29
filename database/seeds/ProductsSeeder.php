@@ -1,6 +1,9 @@
 <?php
 
+use App\Models\SystemImage;
 use Illuminate\Database\Seeder;
+use App\Models\Product;
+use App\Models\ProductSkuTemplate;
 
 class ProductsSeeder extends Seeder
 {
@@ -12,38 +15,62 @@ class ProductsSeeder extends Seeder
     public function run()
     {
         $faker = app(Faker\Generator::class);
-        $products = factory(\App\Models\Product::class, 30)->create();
+        $products = factory(Product::class, 30)->create();
 
         foreach ($products as $product) {
-            $attributes = $product->category->skuAttributes();
-            $values = collect($this->getAttibuteRandomValues());
-            $skuAttributes = [];
-            foreach ($attributes as $attribute) {
-                $temp = [
-                    'id' => $attributes->id,
-                    'value' => $values->pluck($attribute->name)->random(),
+            $image = SystemImage::query()->inRandomOrder()->first();
+            $template = ProductSkuTemplate::query()->inRandomOrder()->first();
+
+            // SKU 多规格
+            $productSkuAttributesData = [];
+            foreach ($template->value as $data) {
+                $productSkuAttributesData[] = [
+                    'name'  => $data['name'],
+                    'value' => $data['attributes'],
                 ];
-                $skuAttributes[] = $temp;
+            }
+            $skuAttributes = $product->skuAttributes()->createMany($productSkuAttributesData);
+
+            $formatted = (new \App\Services\ProductService)->formatAttributes($skuAttributes);
+
+            // SKU
+            $skusData = [];
+            foreach ($formatted as $attribute) {
+                $attributesTemp = [];
+                foreach ($attribute['attribute'] as $name => $value) {
+                    $attributesTemp[] = [
+                        'name' => $name,
+                        'value' => $value,
+                    ];
+                }
+
+                $skusData[] = [
+                    'name'       => $faker->word,
+                    'image'      => $image->path,
+                    'price'      => $faker->randomNumber(4),
+                    'stock'      => $faker->randomNumber(5),
+                    'attributes' => $attributesTemp,
+                ];
             }
 
-            $skus = factory(\App\Models\ProductSku::class, 3)->create([
-                'product_id' => $product->id,
-                'attributes' => $skuAttributes
+            $skus = $product->skus()->createMany($skusData);
+
+            $product->description()->create([
+                'description' => $faker->sentence,
             ]);
 
+            // 商品的价格更新为 SKU 中最低的价格
             $product->update(['price' => $skus->min('price')]);
-        }
-    }
 
-    protected function getAttibuteRandomValues()
-    {
-        return [
-            '选择颜色' => ['白色', '黑色', '蓝色'],
-            '选择版本' => ['版本一', '版本二'],
-            '套餐' => ['套餐一', '套餐二', '套餐三'],
-            '选择尺寸' => ['26寸', '36寸', '66寸'],
-            '配置' => ['配置一', '配置二', '配置三'],
-            '选择尺码' => ['26', '27', '28', '29', '30', '31', '32']
-        ];
+            if ($product->type === Product::TYPE_CROWDFUNDING) {
+
+                $product->crowdfunding()->create([
+                    'target_amount' => $faker->randomNumber(6),
+                    'total_amount'  => $faker->randomNumber(3),
+                    'user_count'    => $faker->randomNumber(2),
+                    'end_at'        => $faker->dateTimeBetween('now', '+5 days'),
+                ]);
+            }
+        }
     }
 }

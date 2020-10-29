@@ -23,13 +23,16 @@ class SeedRolesAndPermissionsData extends Migration
         $role = Role::query()->create(['name' => config('app.super_admin_role_name')]);
 
         $routes = Route::getRoutes();
+        $nowTime = \Illuminate\Support\Carbon::now();
         $permissions = [];
         foreach ($routes as $k => $route) {
             if (strpos($k, 'admin') !== false) {
                 if (in_array('admin.refresh', $route['action']['middleware'])) {
                     $permissions[] = [
                         'name'       => $route['action']['as'],
-                        'guard_name' => 'admin'
+                        'guard_name' => 'admin',
+                        'created_at' => $nowTime,
+                        'updated_at' => $nowTime,
                     ];
                 }
             }

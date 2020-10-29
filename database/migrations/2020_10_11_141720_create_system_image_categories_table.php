@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateAdminImagesTable extends Migration
+class CreateSystemImageCategoriesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,12 @@ class CreateAdminImagesTable extends Migration
      */
     public function up()
     {
-        Schema::create('admin_images', function (Blueprint $table) {
+        Schema::create('system_image_categories', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->integer('admin_user_id')->index();
-            $table->string('type')->index();
+            $table->string('name');
+            $table->unsignedBigInteger('parent_id')->nullable();
+            $table->foreign('parent_id')->references('id')->on('system_image_categories')->onDelete('cascade');
+            $table->unsignedInteger('level');
             $table->string('path');
             $table->dateTime('created_at');
             $table->dateTime('updated_at');
@@ -30,6 +32,6 @@ class CreateAdminImagesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('admin_images');
+        Schema::dropIfExists('system_image_categories');
     }
 }

@@ -76,20 +76,6 @@ class ProductCategoriesSeeder extends Seeder
         //  保存到数据库
         $category->save();
 
-        if ($attributesData = collect($this->getAttributes())->only($category->name)->values()) {
-            $attributes = [];
-            foreach ($attributesData as $attribute) {
-                foreach ($attribute as $value) {
-                    $temp = [
-                        'name' => $value
-                    ];
-                    $attributes[] = $temp;
-                }
-            }
-
-            $category->skuAttributes()->createMany($attributes);
-        }
-
         // 如果有 children 字段并且 children 字段是一个数组
         if (isset($data['children']) && is_array($data['children'])) {
             // 遍历 children 字段
@@ -98,68 +84,5 @@ class ProductCategoriesSeeder extends Seeder
                 $this->createCategory($child, $category);
             }
         }
-    }
-
-    protected function getAttributes()
-    {
-        return [
-            '手机配件' => [
-                '套装', '选择颜色'
-            ],
-            '手机壳' => [
-                '选择颜色', '选择版本'
-            ],
-            '存储卡' => [
-                '选择颜色'
-            ],
-            '数据线' => [
-                '选择颜色', '选择版本'
-            ],
-            '充电器' => [
-                '选择颜色', '选择版本', '套餐'
-            ],
-            '耳机' => [
-                '选择颜色', '选择版本', '套餐'
-            ],
-            '有线耳机' => [
-                '选择颜色', '选择版本', '套餐'
-            ],
-            '蓝牙耳机' => [
-                '选择颜色', '选择版本', '套餐'
-            ],
-            '电脑配件' => [
-                '选择颜色', '选择版本', '套餐', '选择尺寸'
-            ],
-            '显卡' => [
-                '选择型号', '选择版本', '套餐', '选择尺寸'
-            ],
-            '显示器' => [
-                '选择尺寸'
-            ],
-            '电脑' => [
-                '选择颜色', '选择版本', '套餐', '选择尺寸', '配置'
-            ],
-            '笔记本' => [
-                '选择颜色', '选择版本', '套餐', '选择尺寸', '配置'
-            ],
-            '台式机' => [
-                '选择颜色', '选择版本', '套餐', '选择尺寸', '配置'
-            ],
-            '平板电脑' => [
-                '选择颜色', '选择版本', '套餐', '选择尺寸', '配置'
-            ],
-            '手机通讯' => [
-                '选择颜色', '选择版本', '套餐'
-            ],
-            '手机' => [
-                '选择颜色', '选择版本', '套餐'
-            ],
-            '游戏手机' => [
-                '选择颜色', '选择版本', '套餐'
-            ],
-            '5G手机' => [
-                '选择颜色', '选择版本', '套餐'
-            ],
-        ];
     }
 }

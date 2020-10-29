@@ -17,6 +17,7 @@ class AdminVueMenusSeeder extends Seeder
                 'name' => 'Auth',
                 'path' => '/auth',
                 'component' => 'Layout',
+                'is_showed' => true,
                 'meta' => [
                     'icon' => 'lock',
                     'title' => '权限管理'
@@ -26,6 +27,7 @@ class AdminVueMenusSeeder extends Seeder
                         'name' => 'Admin',
                         'path' => 'admin',
                         'component' => 'Admin',
+                        'is_showed' => true,
                         'meta' => [
                             'title' => '管理员'
                         ],
@@ -34,6 +36,7 @@ class AdminVueMenusSeeder extends Seeder
                         'name' => 'Role',
                         'path' => 'role',
                         'component' => 'Role',
+                        'is_showed' => true,
                         'meta' => [
                             'title' => '角色'
                         ],
@@ -42,6 +45,7 @@ class AdminVueMenusSeeder extends Seeder
                         'name' => 'Permission',
                         'path' => 'permission',
                         'component' => 'Permission',
+                        'is_showed' => true,
                         'meta' => [
                             'title' => '权限'
                         ],
@@ -50,12 +54,111 @@ class AdminVueMenusSeeder extends Seeder
                         'name' => 'VueMenu',
                         'path' => 'vue_menu',
                         'component' => 'VueMenu',
+                        'is_showed' => true,
                         'meta' => [
                             'title' => 'Vue 菜单'
                         ],
                     ],
                 ]
-            ]
+            ],
+            [
+                'name' => 'OrderManage',
+                'path' => '/order',
+                'component' => 'Layout',
+                'is_showed' => true,
+                'meta' => [
+                    'icon' => '',
+                    'title' => ''
+                ],
+                'children' => [
+                    [
+                        'name' => 'Order',
+                        'path' => 'order',
+                        'component' => 'Order',
+                        'is_showed' => true,
+                        'meta' => [
+                            'icon' => 'el-icon-s-order',
+                            'title' => '订单管理',
+                        ],
+                    ],
+                ]
+            ],
+            [
+                'name' => 'ProductManage',
+                'path' => '/product',
+                'component' => 'Layout',
+                'is_showed' => true,
+                'meta' => [
+                    'icon' => 'el-icon-s-goods',
+                    'title' => '商品管理'
+                ],
+                'children' => [
+                    [
+                        'name' => 'Product',
+                        'path' => '',
+                        'component' => 'Product',
+                        'is_showed' => true,
+                        'meta' => [
+                            'icon' => '',
+                            'title' => '普通商品',
+                        ],
+                    ],
+                    [
+                        'name' => 'EditProduct',
+                        'path' => '/product/edit/:id(\\d+)',
+                        'component' => 'EditProduct',
+                        'is_showed' => false,
+                        'meta' => [
+                            'icon' => '',
+                            'title' => '编辑普通商品',
+                            'activeMenu' => '/product',
+                        ],
+                    ],
+                    [
+                        'name' => 'CreateProduct',
+                        'path' => '/product/create',
+                        'component' => 'CreateProduct',
+                        'is_showed' => false,
+                        'meta' => [
+                            'icon' => '',
+                            'title' => '新建普通商品',
+                            'activeMenu' => '/product',
+                        ],
+                    ],
+                    [
+                        'name' => 'CrowdfundingProduct',
+                        'path' => '/product/crowdfunding',
+                        'component' => 'CrowdfundingProduct',
+                        'is_showed' => true,
+                        'meta' => [
+                            'icon' => '',
+                            'title' => '众筹商品',
+                        ],
+                    ],
+                    [
+                        'name' => 'EditCrowdfundingProduct',
+                        'path' => '/product/crowdfunding/edit/:id(\\d+)',
+                        'component' => 'EditCrowdfundingProduct',
+                        'is_showed' => false,
+                        'meta' => [
+                            'icon' => '',
+                            'title' => '编辑众筹商品',
+                            'activeMenu' => '/product/crowdfunding',
+                        ],
+                    ],
+                    [
+                        'name' => 'CreateCrowdfundingProduct',
+                        'path' => '/product/crowdfunding/create',
+                        'component' => 'CreateCrowdfundingProduct',
+                        'is_showed' => false,
+                        'meta' => [
+                            'icon' => '',
+                            'title' => '新建众筹商品',
+                            'activeMenu' => '/product/crowdfunding',
+                        ],
+                    ],
+                ]
+            ],
         ];
 
         foreach ($menus as $data) {
@@ -69,6 +172,7 @@ class AdminVueMenusSeeder extends Seeder
             'name'      => $data['name'],
             'path'      => $data['path'],
             'meta'      => $data['meta'],
+            'is_showed' => $data['is_showed'],
             'component' => $data['component'],
         ]);
 

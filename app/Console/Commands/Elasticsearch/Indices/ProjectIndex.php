@@ -20,7 +20,7 @@ class ProjectIndex
             'category_id'   => ['type' => 'integer'],
             'category'      => ['type' => 'keyword'],
             'category_path' => ['type' => 'keyword'],
-            'description'   => ['type' => 'text', 'analyzer' => 'ik_smart'],
+            "description"   => ['type' => 'text', 'analyzer' => 'ik_smart'],
             'price'         => ['type' => 'scaled_float', 'scaling_factor' => 100],
             'on_sale'       => ['type' => 'boolean'],
             'rating'        => ['type' => 'float'],
@@ -29,18 +29,13 @@ class ProjectIndex
             'skus'          => [
                 'type'       => 'nested',
                 'properties' => [
-                    'title'       => [
+                    'title' => [
                         'type'            => 'text',
                         'analyzer'        => 'ik_smart',
                         'search_analyzer' => 'ik_smart_synonym',
                         'copy_to'         => 'skus_title',
                     ],
-                    'description' => [
-                        'type'     => 'text',
-                        'analyzer' => 'ik_smart',
-                        'copy_to'  => 'skus_description',
-                    ],
-                    'price'       => ['type' => 'scaled_float', 'scaling_factor' => 100],
+                    'price' => ['type' => 'scaled_float', 'scaling_factor' => 100],
                 ],
             ],
             'properties'    => [

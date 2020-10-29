@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class DeleteAvatarToAdminUsers extends Migration
+class CreateProductSkuTemplatesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,10 @@ class DeleteAvatarToAdminUsers extends Migration
      */
     public function up()
     {
-        Schema::table('admin_users', function (Blueprint $table) {
-            $table->dropColumn(['avatar']);
+        Schema::create('product_sku_templates', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->string('name', 40);
+            $table->json('value');
         });
     }
 
@@ -25,8 +27,6 @@ class DeleteAvatarToAdminUsers extends Migration
      */
     public function down()
     {
-        Schema::table('admin_users', function (Blueprint $table) {
-            $table->string('avatar')->nullable()->after('phone');
-        });
+        Schema::dropIfExists('product_sku_templates');
     }
 }

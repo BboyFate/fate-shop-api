@@ -116,7 +116,6 @@ return [
     'seckill_order_ttl' => 600,
 
     // 默认图片
-    'image_admin_avatar' => '/commons/images/admin-avatar.jpg',
     'image_product' => '/commons/images/product.png',
 
     // 默认超级管理员的角色名称

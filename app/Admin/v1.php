@@ -38,9 +38,21 @@ $router->group([
      */
     $router->group(['middleware' => ['admin.refresh', 'admin.check_permissions']], function () use ($router) {
         // 上传图片
+        $router->get('images', [
+            'uses' => 'SystemImagesController@index',
+            'as' => 'api.v1.admin.images.index'
+        ]);
         $router->post('images', [
-            'uses' => 'ImagesController@store',
+            'uses' => 'SystemImagesController@store',
             'as' => 'api.v1.admin.images.store'
+        ]);
+        $router->delete('images/{image:[0-9]+}', [
+            'uses' => 'SystemImagesController@destroy',
+            'as' => 'api.v1.admin.images.store'
+        ]);
+        $router->post('images/delete', [
+            'uses' => 'SystemImagesController@imagesDestroy',
+            'as' => 'api.v1.admin.images.images_destroy'
         ]);
 
         $router->group(['namespace' => 'Auth'], function ($router) {
@@ -122,7 +134,7 @@ $router->group([
                 'uses' => 'RolesController@update',
                 'as' => 'api.v1.admin.auth.roles.update'
             ]);
-            $router->delete('auth/roles/{role}', [
+            $router->delete('auth/roles/{role:[0-9]+}', [
                 'uses' => 'RolesController@destroy',
                 'as' => 'api.v1.admin.auth.roles.destroy'
             ]);
@@ -212,6 +224,15 @@ $router->group([
                 'as' => 'api.v1.admin.products.destroy'
             ]);
 
+            $router->delete('product_skus/{sku:[0-9]+}', [
+                'uses' => 'ProductsController@skuDestroy',
+                'as' => 'api.v1.admin.product_skus.destroy'
+            ]);
+            $router->post('product_skus/delete', [
+                'uses' => 'ProductsController@skusDestroy',
+                'as' => 'api.v1.admin.product_skus.skus_destroy'
+            ]);
+
             /**
              * 众筹商品
              */
@@ -234,6 +255,11 @@ $router->group([
             $router->delete('crowdfunding_products/{product}', [
                 'uses' => 'CrowdfundingProductsController@destroy',
                 'as' => 'api.v1.admin.crowdfunding_products.destroy'
+            ]);
+
+            $router->post('product_sku_attributes/format', [
+                'uses' => 'ProductSkuAttributesController@format',
+                'as' => 'api.v1.admin.product_sku_attributes.format'
             ]);
         });
 

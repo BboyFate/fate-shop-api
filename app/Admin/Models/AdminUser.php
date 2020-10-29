@@ -42,21 +42,6 @@ class AdminUser extends Model implements AuthenticatableContract, AuthorizableCo
         'password',
     ];
 
-    public function getAvatarAttribute()
-    {
-        if ($image = $this->images(AdminImage::TYPE_AVATAR)->latest()->first()) {
-            $avatar = $image->path;
-        } else {
-            $avatar = config('app.image_admin_avatar');
-        }
-        return config('app.url') . $avatar;
-    }
-
-    public function images($type = AdminImage::TYPE_PRODUCT)
-    {
-        return $this->hasMany(AdminImage::class)->where('type', $type);
-    }
-
     public function roles()
     {
         return $this->morphToMany(

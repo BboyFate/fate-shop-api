@@ -3,8 +3,8 @@
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
 use Faker\Generator as Faker;
-use App\Models\ProductSku;
-use App\Models\SystemImage;
+use App\Models\ProductSkuAttribute;
+use App\Models\ProductSkuTemplate;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,12 +17,19 @@ use App\Models\SystemImage;
 |
 */
 
-$factory->define(ProductSku::class, function (Faker $faker) {
-    $image = SystemImage::query()->inRandomOrder()->first();
+$factory->define(ProductSkuAttribute::class, function (Faker $faker) {
+    $template = ProductSkuTemplate::query()->inRandomOrder()->first();
+
+    $attributes = [];
+    foreach ($template->value as $data) {
+        $attributes[] = [
+            'name'  => $data['name'],
+            'value' => $data['attributes'],
+        ];
+    }
 
     return [
-        'image' => $image->path,
-        'price' => $faker->randomNumber(4),
-        'stock' => $faker->randomNumber(5),
+        'name'  => $faker->name,
+        'value' => $attributes,
     ];
 });
