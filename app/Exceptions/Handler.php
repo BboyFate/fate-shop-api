@@ -45,6 +45,20 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
+        if ($request->expectsJson()) {
+            $reporter = ExceptionReport::make($request, $exception);
+            if ($reporter->shouldReturn()) {
+                return $reporter->report();
+            }
+
+            // 线上未知的错误，显示 500
+            if (app()->environment() === 'production') {
+                return $reporter->prodReport();
+            }
+        }
+
         return parent::render($request, $exception);
     }
+
+
 }

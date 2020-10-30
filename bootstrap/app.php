@@ -21,9 +21,9 @@ $app = new Laravel\Lumen\Application(
     dirname(__DIR__)
 );
 
-// $app->withFacades();
+$app->withFacades();
 
-// $app->withEloquent();
+$app->withEloquent();
 
 /*
 |--------------------------------------------------------------------------
@@ -58,6 +58,17 @@ $app->singleton(
 */
 
 $app->configure('app');
+$app->configure('auth');
+$app->configure('broadcasting');
+$app->configure('cache');
+$app->configure('database');
+$app->configure('filesystems');
+$app->configure('logging');
+$app->configure('queue');
+$app->configure('services');
+$app->configure('views');
+$app->configure('easysms');
+$app->configure('permission');
 
 /*
 |--------------------------------------------------------------------------
@@ -71,12 +82,21 @@ $app->configure('app');
 */
 
 // $app->middleware([
-//     App\Http\Middleware\ExampleMiddleware::class
+//     App\Http\Middleware\RandomDropSeckillRequest::class
 // ]);
 
-// $app->routeMiddleware([
-//     'auth' => App\Http\Middleware\Authenticate::class,
-// ]);
+$app->routeMiddleware([
+    'auth'                    => App\Http\Middleware\Authenticate::class,
+    'random_drop'             => App\Http\Middleware\RandomDropSeckillRequest::class,
+    'accept_header'           => App\Http\Middleware\AcceptHeader::class,
+    'admin.guard'             => App\Admin\Middleware\AdminGuardMiddleware::class,
+    'admin.check_permissions' => App\Admin\Middleware\AdminCheckPermissionsMiddleware::class,
+    'admin.refresh'           => App\Admin\Middleware\RefreshAdminTokenMiddleware::class,
+    'permission'              => Spatie\Permission\Middlewares\PermissionMiddleware::class,
+    'role'                    => Spatie\Permission\Middlewares\RoleMiddleware::class,
+]);
+
+$app->alias('cache', \Illuminate\Cache\CacheManager::class);
 
 /*
 |--------------------------------------------------------------------------
@@ -89,9 +109,28 @@ $app->configure('app');
 |
 */
 
-// $app->register(App\Providers\AppServiceProvider::class);
-// $app->register(App\Providers\AuthServiceProvider::class);
-// $app->register(App\Providers\EventServiceProvider::class);
+/*
+* Application Service Providers...
+*/
+$app->register(App\Providers\AppServiceProvider::class);
+$app->register(App\Providers\AuthServiceProvider::class);
+$app->register(App\Providers\EventServiceProvider::class);
+
+/*
+ * Package Service Providers...
+ */
+$app->register(Tymon\JWTAuth\Providers\LumenServiceProvider::class);
+$app->register(Overtrue\LaravelLang\TranslationServiceProvider::class);
+$app->register(SocialiteProviders\Manager\ServiceProvider::class);
+$app->register(Illuminate\Redis\RedisServiceProvider::class);
+$app->register(Yansongda\LaravelPay\PayServiceProvider::class);
+$app->register(Intervention\Image\ImageServiceProviderLumen::class);
+$app->register(Spatie\Permission\PermissionServiceProvider::class);
+
+/*
+ * Custom Service Providers.
+ */
+$app->register(App\Providers\EasySmsServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------
@@ -107,7 +146,14 @@ $app->configure('app');
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
 ], function ($router) {
-    require __DIR__.'/../routes/web.php';
+    require __DIR__.'/../routes/api/v1.php';
+    // require __DIR__.'/../routes/web.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Admin\Controllers',
+], function ($router) {
+    require __DIR__.'/../app/Admin/v1.php';
 });
 
 return $app;

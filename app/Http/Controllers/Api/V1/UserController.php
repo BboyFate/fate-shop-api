@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api\V1;
 
-class ExampleController extends Controller
+class UserController extends Controller
 {
     /**
      * Create a new controller instance.

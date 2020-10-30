@@ -13,7 +13,9 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        //
+        Commands\GenerateToken::class,
+        Commands\Elasticsearch\Migrate::class,
+        Commands\Elasticsearch\SyncProducts::class,
     ];
 
     /**
