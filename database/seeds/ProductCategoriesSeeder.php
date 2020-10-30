@@ -17,7 +17,6 @@ class ProductCategoriesSeeder extends Seeder
                 'name'     => '手机配件',
                 'children' => [
                     ['name' => '手机壳'],
-                    ['name' => '贴膜'],
                     ['name' => '存储卡'],
                     ['name' => '数据线'],
                     ['name' => '充电器'],
@@ -42,22 +41,19 @@ class ProductCategoriesSeeder extends Seeder
                 ],
             ],
             [
-                'name'     => '电脑整机',
+                'name'     => '电脑',
                 'children' => [
                     ['name' => '笔记本'],
                     ['name' => '台式机'],
                     ['name' => '平板电脑'],
-                    ['name' => '一体机'],
-                    ['name' => '服务器'],
-                    ['name' => '工作站'],
                 ],
             ],
             [
                 'name'     => '手机通讯',
                 'children' => [
-                    ['name' => '智能机'],
-                    ['name' => '老人机'],
-                    ['name' => '对讲机'],
+                    ['name' => '手机'],
+                    ['name' => '游戏手机'],
+                    ['name' => '5G手机'],
                 ],
             ],
         ];
@@ -79,6 +75,7 @@ class ProductCategoriesSeeder extends Seeder
         }
         //  保存到数据库
         $category->save();
+
         // 如果有 children 字段并且 children 字段是一个数组
         if (isset($data['children']) && is_array($data['children'])) {
             // 遍历 children 字段

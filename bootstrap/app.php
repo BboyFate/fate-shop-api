@@ -68,6 +68,7 @@ $app->configure('queue');
 $app->configure('services');
 $app->configure('views');
 $app->configure('easysms');
+$app->configure('permission');
 
 /*
 |--------------------------------------------------------------------------
@@ -85,9 +86,17 @@ $app->configure('easysms');
 // ]);
 
 $app->routeMiddleware([
-    'auth' => App\Http\Middleware\Authenticate::class,
-    'random_drop' => App\Http\Middleware\RandomDropSeckillRequest::class,
+    'auth'                    => App\Http\Middleware\Authenticate::class,
+    'random_drop'             => App\Http\Middleware\RandomDropSeckillRequest::class,
+    'accept_header'           => App\Http\Middleware\AcceptHeader::class,
+    'admin.guard'             => App\Admin\Middleware\AdminGuardMiddleware::class,
+    'admin.check_permissions' => App\Admin\Middleware\AdminCheckPermissionsMiddleware::class,
+    'admin.refresh'           => App\Admin\Middleware\RefreshAdminTokenMiddleware::class,
+    'permission'              => Spatie\Permission\Middlewares\PermissionMiddleware::class,
+    'role'                    => Spatie\Permission\Middlewares\RoleMiddleware::class,
 ]);
+
+$app->alias('cache', \Illuminate\Cache\CacheManager::class);
 
 /*
 |--------------------------------------------------------------------------
@@ -115,6 +124,8 @@ $app->register(Overtrue\LaravelLang\TranslationServiceProvider::class);
 $app->register(SocialiteProviders\Manager\ServiceProvider::class);
 $app->register(Illuminate\Redis\RedisServiceProvider::class);
 $app->register(Yansongda\LaravelPay\PayServiceProvider::class);
+$app->register(Intervention\Image\ImageServiceProviderLumen::class);
+$app->register(Spatie\Permission\PermissionServiceProvider::class);
 
 /*
  * Custom Service Providers.
@@ -137,6 +148,12 @@ $app->router->group([
 ], function ($router) {
     require __DIR__.'/../routes/api/v1.php';
     // require __DIR__.'/../routes/web.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Admin\Controllers',
+], function ($router) {
+    require __DIR__.'/../app/Admin/v1.php';
 });
 
 return $app;

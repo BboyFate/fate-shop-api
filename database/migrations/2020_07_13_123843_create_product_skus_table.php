@@ -15,12 +15,12 @@ class CreateProductSkusTable extends Migration
     {
         Schema::create('product_skus', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('name')->comment('SKU 名称');
-            $table->string('description')->comment('SKU 描述');
-            $table->decimal('price', 10, 2)->comment('SKU 价格');
-            $table->unsignedInteger('stock')->comment('库存');
             $table->unsignedBigInteger('product_id');
             $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
+            $table->string('name')->comment('SKU 名称');
+            $table->string('image')->comment('SKU 图片');
+            $table->decimal('price', 10, 2)->comment('SKU 价格');
+            $table->unsignedInteger('stock')->comment('库存');
             $table->json('attributes');
             $table->dateTime('created_at');
             $table->dateTime('updated_at');

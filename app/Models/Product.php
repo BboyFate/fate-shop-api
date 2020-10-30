@@ -3,10 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Product extends Model
 {
+    use SoftDeletes;
+
     const TYPE_NORMAL       = 'normal';
     const TYPE_CROWDFUNDING = 'crowdfunding';
     const TYPE_SECKILL      = 'seckill';
@@ -18,24 +20,31 @@ class Product extends Model
     ];
 
     protected $fillable = [
+        'type',
         'title',
-        'description',
+        'long_title',
         'image',
+        'banners',
         'on_sale',
         'rating',
         'sold_count',
         'review_count',
         'price',
-        'type',
     ];
 
     protected $casts = [
         'on_sale' => 'boolean',
+        'banners' => 'array',
     ];
 
     public function category()
     {
         return $this->belongsTo(ProductCategory::class);
+    }
+
+    public function description()
+    {
+        return $this->hasOne(ProductDescription::class);
     }
 
     public function skus()
@@ -45,7 +54,7 @@ class Product extends Model
 
     public function skuAttributes()
     {
-        return $this->hasMany(ProductSkuAttributes::class);
+        return $this->hasMany(ProductSkuAttribute::class);
     }
 
     public function properties()
@@ -61,21 +70,6 @@ class Product extends Model
     public function seckill()
     {
         return $this->hasOne(SeckillProduct::class);
-    }
-
-    /**
-     * 访问器
-     * 图片的绝对路径
-     *
-     * @return mixed
-     */
-    public function getImageUrlAttribute()
-    {
-        // 如果 image 字段本身就已经是完整的 url 就直接返回
-        if (Str::startsWith($this->attributes['image'], ['http://', 'https://'])) {
-            return $this->attributes['image'];
-        }
-        return \Storage::disk('public')->url($this->attributes['image']);
     }
 
     /**
@@ -127,10 +121,10 @@ class Product extends Model
         // 类目的 path 字段
         $arr['category_path'] = $this->category ? $this->category->path : '';
         // strip_tags 函数可以将 html 标签去除
-        $arr['description'] = strip_tags($this->description);
+        $arr['description'] = strip_tags($this->description ? $this->description->description : '');
         // 只取出需要的 SKU 字段
         $arr['skus'] = $this->skus->map(function (ProductSku $sku) {
-            return Arr::only($sku->toArray(), ['name', 'description', 'price']);
+            return Arr::only($sku->toArray(), ['name', 'price']);
         });
         // 只取出需要的商品属性字段
         $arr['properties'] = $this->properties->map(function (ProductProperty $property) {
@@ -138,7 +132,6 @@ class Product extends Model
                 'search_value' => $property->name . ':' . $property->value
             ]);
         });
-
         return $arr;
     }
 }

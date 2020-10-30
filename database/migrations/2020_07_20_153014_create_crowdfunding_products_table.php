@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCrowdfoundingProductsTable extends Migration
+class CreateCrowdfundingProductsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateCrowdfoundingProductsTable extends Migration
      */
     public function up()
     {
-        Schema::create('crowdfounding_products', function (Blueprint $table) {
+        Schema::create('crowdfunding_products', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('product_id');
             $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
@@ -34,6 +34,6 @@ class CreateCrowdfoundingProductsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('crowdfounding_products');
+        Schema::dropIfExists('crowdfunding_products');
     }
 }

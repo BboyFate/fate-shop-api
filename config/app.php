@@ -115,4 +115,9 @@ return [
     // 秒杀订单的自动关闭时间，秒为单位
     'seckill_order_ttl' => 600,
 
+    // 默认图片
+    'image_product' => '/commons/images/product.png',
+
+    // 默认超级管理员的角色名称
+    'super_admin_role_name' => 'SuperAdmin',
 ];
