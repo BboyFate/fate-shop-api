@@ -74,6 +74,10 @@ $router->group([
         'uses' => 'PaymentController@wechatNotify',
         'as' => 'api.v1.payment.wechat.notify'
     ]);
+    $router->post('payment/wechat/refund_notify', [
+        'uses' => 'PaymentController@wechatRefundNotify',
+        'as' => 'api.v1.payment.wechat.refund_notify'
+    ]);
 
     /**
      * 需要登录才能访问的 API

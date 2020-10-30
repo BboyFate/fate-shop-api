@@ -20,15 +20,16 @@ class CreateProductsTable extends Migration
             $table->foreign('category_id')->references('id')->on('product_categories')->onDelete('set null');
             $table->string('title')->comment('商品短标题');
             $table->string('long_title')->comment('商品长标题');
-            $table->text('description')->comment('商品详情');
-            $table->string('image')->comment('商品封面图片文件路径');
+            $table->string('image')->comment('商品封面图片');
+            $table->string('banners')->comment('商品轮播图');
             $table->boolean('on_sale')->default(true)->comment('商品是否正在售卖');
             $table->float('rating')->default(5)->comment('商品平均评分');
             $table->unsignedInteger('sold_count')->default(0)->comment('销量');
             $table->unsignedInteger('review_count')->default(0)->comment('评论数量');
-            $table->decimal('price', 10, 2)->comment('SKU 最低价格');
+            $table->decimal('price', 10, 2)->default(0)->comment('SKU 最低价格');
             $table->dateTime('created_at');
             $table->dateTime('updated_at');
+            $table->softDeletes();
         });
     }
 

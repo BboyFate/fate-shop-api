@@ -179,36 +179,17 @@ class Response
      */
     public function success($data = null, string $message = '', array $headers = [], $option = 0)
     {
-        if (! $data instanceof JsonResource) {
-            return $this->formatArrayResponse($data, $message, $headers, $option);
+        $message = (! $message && isset(HttpResponse::$statusTexts[$this->httpCode])) ? HttpResponse::$statusTexts[$this->httpCode] : 'OK';
+        $additionalData = [
+            'status' => 'success',
+            'message' => $message
+        ];
+
+        if ($data instanceof JsonResource) {
+            return $data->additional($additionalData);
         }
 
-        if ($data instanceof ResourceCollection && ($data->resource instanceof AbstractPaginator)) {
-            return $this->formatPaginatedResourceResponse(...func_get_args());
-        }
-
-        return $this->formatResourceResponse(...func_get_args());
-    }
-
-    public function respondWithArray(array $data, string $message = '', array $headers = [])
-    {
-        return $this->formatArrayResponse($data, $message, $headers);
-    }
-
-    /**
-     * 格式化标准的数组格式数据
-     *
-     * @param array|null $data
-     * @param string $message
-     * @param int $code
-     * @param array $headers
-     * @param int $option
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    protected function formatArrayResponse($data, string $message = '', array $headers = [], $option = 0)
-    {
-        return response()->json($this->formatData($data, $message), $this->httpCode, $headers, $option);
+        return response()->json(array_merge($additionalData, ['data' => $data ?: (object) $data]), $this->httpCode, $headers, $option);
     }
 
     protected function formatData($data, $message)

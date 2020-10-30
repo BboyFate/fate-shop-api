@@ -37,9 +37,23 @@ class ProductSearchBuilder
     /**
      * 筛选上架的商品
      */
-    public function onSale()
+    public function onSale($onSale = true)
     {
-        $this->params['body']['query']['bool']['filter'][] = ['term' => ['on_sale' => true]];
+        $this->params['body']['query']['bool']['filter'][] = ['term' => ['on_sale' => $onSale]];
+
+        return $this;
+    }
+
+    /**
+     * 筛选商品类型
+     *
+     * @param $type
+     *
+     * @return $this
+     */
+    public function productType($type)
+    {
+        $this->params['body']['query']['bool']['filter'][] = ['term' => ['type' => $type]];
 
         return $this;
     }
@@ -85,7 +99,6 @@ class ProductSearchBuilder
                         'category^2',
                         'description',
                         'skus_name',
-                        'skus_description',
                         'properties_value',
                     ],
                 ],

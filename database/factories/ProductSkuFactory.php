@@ -4,6 +4,7 @@
 
 use Faker\Generator as Faker;
 use App\Models\ProductSku;
+use App\Models\SystemImage;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,10 +18,11 @@ use App\Models\ProductSku;
 */
 
 $factory->define(ProductSku::class, function (Faker $faker) {
+    $image = SystemImage::query()->inRandomOrder()->first();
+
     return [
-        'name'        => $faker->word,
-        'description' => $faker->sentence,
-        'price'       => $faker->randomNumber(4),
-        'stock'       => $faker->randomNumber(5),
+        'image' => $image->path,
+        'price' => $faker->randomNumber(4),
+        'stock' => $faker->randomNumber(5),
     ];
 });
