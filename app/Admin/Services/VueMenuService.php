@@ -2,8 +2,8 @@
 
 namespace App\Admin\Services;
 
-use App\Admin\Models\AdminVueMenu;
-use App\Admin\Resources\AdminVueMenuResource;
+use App\Models\AdminVueMenu;
+use App\Admin\Http\Resources\AdminVueMenuResource;
 
 class VueMenuService
 {
@@ -32,18 +32,6 @@ class VueMenuService
                 }
 
                 return $data;
-
-
-
-//                $data = new AdminVueMenuResource($menu);
-//
-//                if ($menu->level != 0) {
-//                    return $data;
-//                }
-//
-//                $data['children_array'] = $this->getMenuTree($menu->id, $allMenus)->toArray();
-//
-//                return $data;
             });
     }
 }

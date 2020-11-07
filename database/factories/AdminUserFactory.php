@@ -4,6 +4,7 @@
 
 use Illuminate\Support\Str;
 use Faker\Generator as Faker;
+use App\Models\AdminUser;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,7 +17,7 @@ use Faker\Generator as Faker;
 |
 */
 
-$factory->define(\App\Admin\Models\AdminUser::class, function (Faker $faker) {
+$factory->define(AdminUser::class, function (Faker $faker) {
     return [
         'username' => $faker->name,
         'nickname' => $faker->name,

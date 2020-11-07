@@ -89,9 +89,9 @@ $app->routeMiddleware([
     'auth'                    => App\Http\Middleware\Authenticate::class,
     'random_drop'             => App\Http\Middleware\RandomDropSeckillRequest::class,
     'accept_header'           => App\Http\Middleware\AcceptHeader::class,
-    'admin.guard'             => App\Admin\Middleware\AdminGuardMiddleware::class,
-    'admin.check_permissions' => App\Admin\Middleware\AdminCheckPermissionsMiddleware::class,
-    'admin.refresh'           => App\Admin\Middleware\RefreshAdminTokenMiddleware::class,
+    'auth_refresh'            => App\Http\Middleware\AuthRefreshTokenMiddleware::class,
+    'admin_guard'             => App\Admin\Http\Middleware\AdminGuardMiddleware::class,
+    'admin_check_permissions' => App\Admin\Http\Middleware\AdminCheckPermissionsMiddleware::class,
     'permission'              => Spatie\Permission\Middlewares\PermissionMiddleware::class,
     'role'                    => Spatie\Permission\Middlewares\RoleMiddleware::class,
 ]);
@@ -151,7 +151,7 @@ $app->router->group([
 });
 
 $app->router->group([
-    'namespace' => 'App\Admin\Controllers',
+    'namespace' => 'App\Admin\Http\Controllers',
 ], function ($router) {
     require __DIR__.'/../app/Admin/v1.php';
 });

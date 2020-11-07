@@ -3,7 +3,10 @@
 $router->group([
     'prefix' => 'api/v1/admin',
     'namespace' => 'V1',
-    'middleware' => ['admin.guard', 'accept_header'],
+    'middleware' => [
+        'accept_header',
+        'admin_guard',
+    ],
 ], function () use ($router) {
     /**
      * 验证
@@ -11,7 +14,7 @@ $router->group([
     // 图片验证码
     $router->post('captchas', [
         'uses' => 'CaptchasController@store',
-        'as' => 'api.v1.captchas.store'
+        'as' => 'api.v1.admin.captchas.store'
     ]);
 
     /**
@@ -36,7 +39,10 @@ $router->group([
     /**
      * 需要登录才能访问的 API
      */
-    $router->group(['middleware' => ['admin.refresh', 'admin.check_permissions']], function () use ($router) {
+    $router->group(['middleware' => [
+        'auth_refresh', 
+        'admin_check_permissions'
+    ]], function () use ($router) {
         // 上传图片
         $router->get('images', [
             'uses' => 'SystemImagesController@index',
@@ -60,7 +66,7 @@ $router->group([
                 'uses' => 'UsersController@me',
                 'as' => 'api.v1.admin.user.me'
             ]);
-            $router->put('user', [
+            $router->patch('user', [
                 'uses' => 'UsersController@meUpdate',
                 'as' => 'api.v1.admin.user.me_update'
             ]);
@@ -224,15 +230,6 @@ $router->group([
                 'as' => 'api.v1.admin.products.destroy'
             ]);
 
-            $router->delete('product_skus/{sku:[0-9]+}', [
-                'uses' => 'ProductsController@skuDestroy',
-                'as' => 'api.v1.admin.product_skus.destroy'
-            ]);
-            $router->post('product_skus/delete', [
-                'uses' => 'ProductsController@skusDestroy',
-                'as' => 'api.v1.admin.product_skus.skus_destroy'
-            ]);
-
             /**
              * 众筹商品
              */
@@ -255,6 +252,18 @@ $router->group([
             $router->delete('crowdfunding_products/{product}', [
                 'uses' => 'CrowdfundingProductsController@destroy',
                 'as' => 'api.v1.admin.crowdfunding_products.destroy'
+            ]);
+
+            /**
+             * 商品 SKU
+             */
+            $router->delete('product_skus/{sku:[0-9]+}', [
+                'uses' => 'ProductSkusController@skuDestroy',
+                'as' => 'api.v1.admin.product_skus.destroy'
+            ]);
+            $router->post('product_skus/delete', [
+                'uses' => 'ProductSkusController@skusDestroy',
+                'as' => 'api.v1.admin.product_skus.skus_destroy'
             ]);
 
             $router->post('product_sku_attributes/format', [
