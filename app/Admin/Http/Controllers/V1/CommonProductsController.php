@@ -4,9 +4,9 @@ namespace App\Admin\Http\Controllers\V1;
 
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Spatie\QueryBuilder\QueryBuilder;
 use App\Admin\Http\Resources\ProductResource;
 use App\Models\Product;
-use App\Models\ProductSku;
 use App\Models\ProductCategory;
 use App\SearchBuilders\ProductSearchBuilder;
 use App\Services\ProductService;
@@ -58,7 +58,11 @@ abstract class CommonProductsController extends Controller
         $result = app('es')->search($builder->getParams());
 
         $productIds = collect($result['hits']['hits'])->pluck('_id')->all();
-        $products = Product::query()->with(['crowdfunding', 'category'])->byIds($productIds)->get();
+
+        $products = QueryBuilder::for(Product::class)
+            ->allowedIncludes(['crowdfunding', 'category'])
+            ->byIds($productIds)
+            ->get();
 
         $properties = [];
         // 如果返回结果里有 aggregations 字段，说明做了分面搜索
@@ -143,7 +147,9 @@ abstract class CommonProductsController extends Controller
 
     public function show($id)
     {
-        $product = Product::query()->with(['category', 'skus', 'skuAttributes', 'crowdfunding'])->findOrFail($id);
+        $product = QueryBuilder::for(Product::class)
+            ->allowedIncludes(['category', 'skus', 'skuAttributes', 'crowdfunding'])
+            ->findOrFail($id);
 
         return $this->response->success(new ProductResource($product));
     }

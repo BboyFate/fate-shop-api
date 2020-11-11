@@ -3,6 +3,7 @@
 namespace App\Admin\Http\Controllers\V1\Auth;
 
 use Illuminate\Http\Request;
+use Spatie\QueryBuilder\QueryBuilder;
 use App\Models\AdminRole;
 use App\Admin\Http\Controllers\V1\Controller;
 use App\Admin\Http\Resources\AdminRoleResource;
@@ -12,7 +13,9 @@ class RolesController extends Controller
     public function index(Request $request)
     {
         $limit = $request->input('limit', 15);
-        $roles = AdminRole::query()->with(['permissions', 'vueMenus'])->paginate($limit);
+        $roles = QueryBuilder::for(AdminRole::class)
+            ->allowedIncludes(['permissions', 'vueMenus'])
+            ->paginate($limit);
 
         return $this->response->success(AdminRoleResource::collection($roles));
     }
@@ -37,14 +40,18 @@ class RolesController extends Controller
 
     public function show($id)
     {
-        $role = AdminRole::query()->with(['permissions', 'vueMenus'])->findOrFail($id);
+        $role = QueryBuilder::for(AdminRole::class)
+            ->allowedIncludes(['permissions', 'vueMenus'])
+            ->findOrFail($id);
 
         return $this->response->success(new AdminRoleResource($role));
     }
 
     public function update(Request $request, $id)
     {
-        $role = AdminRole::query()->with(['permissions', 'vueMenus'])->findOrFail($id);
+        $role = QueryBuilder::for(AdminRole::class)
+            ->allowedIncludes(['permissions', 'vueMenus'])
+            ->findOrFail($id);
         $this->validateRequest($request);
 
         $requestData = $request->all();

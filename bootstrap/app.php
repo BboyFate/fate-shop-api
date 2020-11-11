@@ -69,6 +69,7 @@ $app->configure('services');
 $app->configure('views');
 $app->configure('easysms');
 $app->configure('permission');
+$app->configure('query-builder');
 
 /*
 |--------------------------------------------------------------------------

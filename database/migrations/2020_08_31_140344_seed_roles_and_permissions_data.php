@@ -27,7 +27,7 @@ class SeedRolesAndPermissionsData extends Migration
         $permissions = [];
         foreach ($routes as $k => $route) {
             if (strpos($k, 'admin') !== false) {
-                if (in_array('admin.refresh', $route['action']['middleware'])) {
+                if (in_array('auth_refresh', $route['action']['middleware'])) {
                     $permissions[] = [
                         'name'       => $route['action']['as'],
                         'guard_name' => 'admin',

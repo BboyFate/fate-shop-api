@@ -16,7 +16,7 @@
         "ramsey/uuid": "^4.1",
         "socialiteproviders/weixin": "^4.0",
         "spatie/laravel-permission": "^3.16",
-        "spatie/laravel-query-builder": "^2.8",
+        "spatie/laravel-query-builder": "^3.3",
         "tymon/jwt-auth": "^1.0",
         "yansongda/laravel-pay": "^2.2"
     },

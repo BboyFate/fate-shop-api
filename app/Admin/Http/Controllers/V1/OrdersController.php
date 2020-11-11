@@ -3,6 +3,7 @@
 namespace App\Admin\Http\Controllers\V1;
 
 use Illuminate\Http\Request;
+use Spatie\QueryBuilder\QueryBuilder;
 use App\Admin\Http\Resources\OrderResource;
 use App\Models\CrowdfundingProduct;
 use App\Models\Order;
@@ -12,8 +13,9 @@ class OrdersController extends Controller
 {
     public function index(Request $request)
     {
-        $builder = Order::query()
-            ->with(['items.product.crowdfunding', 'items.productSku', 'user:id,nickname']);
+        $builder = QueryBuilder::for(Order::class)
+            ->allowedFields(['user.id', 'user.nickname'])
+            ->allowedIncludes(['items.product.crowdfunding', 'items.productSku', 'user']);
 
         if ($search = $request->input('search', '')) {
             $like = '%' . $search . '%';

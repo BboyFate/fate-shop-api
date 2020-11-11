@@ -26,8 +26,8 @@ class ProductCategoryResource extends JsonResource
             'name'         => $this->name,
             'is_directory' => $this->is_directory,
             'level'        => $this->level,
-            'created_at'   => $this->created_at,
-            'updated_at'   => $this->updated_at,
+            'created_at'   => (string) $this->created_at,
+            'updated_at'   => (string) $this->updated_at,
         ];
 
         if ($this->showFullNameField) {
