@@ -1,10 +1,9 @@
 <?php
 
-use App\Models\ProductSkuTemplate;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
+use App\Models\ProductAttributeTemplate;
 
-class ProductSkuTemplatesSeeder extends Seeder
+class ProductAttributeTemplatesSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -16,31 +15,27 @@ class ProductSkuTemplatesSeeder extends Seeder
         $templates = [
             [
                 'name' => '衣服模板',
-                'value' => [
+                'attributes' => [
                     [
                         'name' => '颜色',
-                        'is_showed' => true,
-                        'attributes' => ['黑色', '白色', '绿色', '红色', '橘色']
+                        'values' => ['黑色', '白色', '绿色', '红色', '橘色']
                     ],
                     [
                         'name' => '尺码',
-                        'is_showed' => true,
-                        'attributes' => ['S', 'M', 'L', 'XL', 'XXL', 'XXXL']
+                        'values' => ['S', 'M', 'L', 'XL', 'XXL', 'XXXL']
                     ]
                 ]
             ],
             [
                 'name' => '鞋子模板',
-                'value' => [
+                'attributes' => [
                     [
                         'name' => '颜色',
-                        'is_showed' => true,
-                        'attributes' => ['黑色', '白色']
+                        'values' => ['黑色', '白色']
                     ],
                     [
                         'name' => '尺码',
-                        'is_showed' => true,
-                        'attributes' => ['37','38','39','40','41','42','43','44','45']
+                        'values' => ['37','38','39','40','41','42','43','44','45']
                     ]
                 ]
             ],
@@ -53,6 +48,6 @@ class ProductSkuTemplatesSeeder extends Seeder
 
     public function createTemplate($data)
     {
-        ProductSkuTemplate::query()->create($data);
+        ProductAttributeTemplate::query()->create($data);
     }
 }

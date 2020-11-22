@@ -23,6 +23,7 @@ class Product extends Model
         'type',
         'title',
         'long_title',
+        'number',
         'image',
         'banners',
         'on_sale',
@@ -52,9 +53,9 @@ class Product extends Model
         return $this->hasMany(ProductSku::class);
     }
 
-    public function skuAttributes()
+    public function attributes()
     {
-        return $this->hasMany(ProductSkuAttribute::class);
+        return $this->hasMany(ProductAttribute::class);
     }
 
     public function properties()

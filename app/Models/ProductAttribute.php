@@ -2,14 +2,14 @@
 
 namespace App\Models;
 
-class ProductSkuAttribute extends Model
+class ProductAttribute extends Model
 {
-    protected $fillable = ['name', 'value'];
+    protected $fillable = ['name', 'values'];
 
     public $timestamps = false;
 
     protected $casts = [
-        'value' => 'array',
+        'values' => 'array',
     ];
 
     public function product()

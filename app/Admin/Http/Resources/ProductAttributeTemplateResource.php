@@ -4,7 +4,7 @@ namespace App\Admin\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ProductSkuAttributeResource extends JsonResource
+class ProductAttributeTemplateResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -14,12 +14,6 @@ class ProductSkuAttributeResource extends JsonResource
      */
     public function toArray($request)
     {
-        //return parent::toArray($request);
-        $data = [
-            'name'  => $this->name,
-            'value' => $this->value,
-        ];
-
-        return $data;
+        return parent::toArray($request);
     }
 }

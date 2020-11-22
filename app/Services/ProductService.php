@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use App\Admin\Http\Resources\ProductCategoryResource;
 use App\Models\Product;
+use App\Models\ProductCategory;
 
 class ProductService
 {
@@ -12,6 +14,7 @@ class ProductService
             $product = new Product([
                 'title'        => $productData['title'],
                 'long_title'   => $productData['long_title'],
+                'number'       => $productData['number'] ?? '',
                 'on_sale'      => $productData['on_sale'],
                 'type'         => $productData['type'],
                 'image'        => $productData['image'],
@@ -24,6 +27,7 @@ class ProductService
             $product->category()->associate($productData['category_id']);
             $product->save();
 
+            // 众筹商品
             if ($productData['type'] === Product::TYPE_CROWDFUNDING) {
                 $product->crowdfunding()->create([
                     'target_amount' => $productData['target_amount'],
@@ -31,12 +35,14 @@ class ProductService
                 ]);
             }
 
+            // 商品描述
             if ($productData['description']) {
                 $product->description()->create([
                     'description' => $productData['description'],
                 ]);
             }
 
+            // 商品属性
             if ($productData['properties']) {
                 foreach ($productData['properties'] as $data) {
                     $product->properties()->create([
@@ -46,6 +52,7 @@ class ProductService
                 }
             }
 
+            // 商品 SKU
             foreach ($productData['skus'] as $data) {
                 $product->skus()->create([
                     'name'       => $data['name'],
@@ -56,14 +63,16 @@ class ProductService
                 ]);
             }
 
-            foreach ($productData['sku_attributes'] as $data) {
-                $product->skuAttributes()->create([
-                    'name'  => $data['name'],
-                    'value' => $data['value'],
+            // 商品规格
+            foreach ($productData['attributes'] as $productAttribute) {
+                $product->attributes()->create([
+                    'name'  => $productAttribute['name'],
+                    'values' => $productAttribute['values'],
                 ]);
             }
 
-            $product->price = collect($productData['skus'])->min('price') ?: 0;
+            // 商品价格更新为 SKU 之中最小的价格
+            $product->update(['price' => collect($productData['skus'])->min('price') ?: 0]);
 
             return $product;
         });
@@ -77,12 +86,11 @@ class ProductService
             $product->update([
                 'title'      => $productData['title'],
                 'long_title' => $productData['long_title'],
+                'number'     => $productData['number'] ?? '',
                 'on_sale'    => $productData['on_sale'],
                 'image'      => $productData['image'],
                 'banners'    => $productData['banners'],
             ]);
-
-            $product->category()->associate($productData['category_id']);
 
             // 众筹商品
             if ($product->type === Product::TYPE_CROWDFUNDING) {
@@ -92,10 +100,15 @@ class ProductService
                 ]);
             }
 
+            // 商品分类
+            $product->category()->associate($productData['category_id']);
+
+            // 商品详情
             if ($productData['description']) {
                 $product->description()->update(['description' => $productData['description']]);
             }
 
+            // 商品属性
             if ($productData['properties']) {
                 foreach ($productData['properties'] as $data) {
                     $temp = [
@@ -111,28 +124,36 @@ class ProductService
                 }
             }
 
-            foreach ($productData['skus'] as $data) {
+            // 商品 SKU
+            $newSkuIds = [];
+            foreach ($productData['skus'] as $skuData) {
                 $temp = [
-                    'name'       => $data['name'],
-                    'image'      => $data['image'],
-                    'price'      => $data['price'],
-                    'stock'      => $data['stock'],
-                    'attributes' => $data['attributes'],
+                    'name'       => $skuData['name'],
+                    'image'      => $skuData['image'],
+                    'price'      => $skuData['price'],
+                    'stock'      => $skuData['stock'],
+                    'attributes' => $skuData['attributes'],
                 ];
 
-                if (isset($data['id'])) {
-                    $product->skus()->where(['id' => $data['id']])->update($temp);
+                if (isset($skuData['id'])) {
+                    $sku = $product->skus()->where(['id' => $skuData['id']])->firstOrFail();
+                    $sku->update($temp);
                 } else {
-                    $product->skus()->create($temp);
+                    $sku = $product->skus()->create($temp);
                 }
+                $newSkuIds[] = $sku->id;
             }
+            $product->skus()->whereNotIn('id', $newSkuIds)->delete();
 
-            foreach ($productData['sku_attributes'] as $data) {
-                $product->skuAttributes()->updateOrCreate(
-                    ['name' => $data['name']],
-                    ['value' => $data['value']]
+            // 商品规格
+            foreach ($productData['attributes'] as $productAttribute) {
+                $product->attributes()->updateOrCreate(
+                    ['name' => $productAttribute['name']],
+                    ['values' => $productAttribute['values']]
                 );
             }
+
+            $product->update(['price' => collect($productData['skus'])->min('price') ?: 0]);
 
             return $product;
         });
@@ -145,16 +166,12 @@ class ProductService
 //        $attributes =  [
 //            [
 //                'name' => '颜色',
-//                'value' => ['黑色', '白色']
+//                'values' => ['黑色', '白色']
 //            ],
 //            [
 //                'name' => '尺码',
-//                'value' => ['S', 'M', 'L']
+//                'values' => ['S', 'M', 'L']
 //            ],
-//            [
-//                'name' => '年龄',
-//                'value' => ['1', '2']
-//            ]
 //        ];
 
         $data = [];
@@ -164,12 +181,12 @@ class ProductService
         if ($count > 1) {
             for ($i = 0; $i < $count - 1; $i++) {
                 if ($i == 0) {
-                    $data = $attributes[$i]['value'];
+                    $data = $attributes[$i]['values'];
                 }
 
                 foreach ($data as $v) {
 
-                    foreach ($attributes[$i + 1]['value'] as $g) {
+                    foreach ($attributes[$i + 1]['values'] as $g) {
                         // 拼接示例： 颜色_黑色-尺码_S
                         // 如果是第一个，返回名称『颜色』；如果不是第一个，返回当前循环的名称和下一个名称
                         $rep2 = ($i != 0 ? '' : $attributes[$i]['name'] . '_') . $v . '-' . $attributes[$i + 1]['name'] . '_' . $g;
@@ -197,7 +214,7 @@ class ProductService
         } else {
             $dataArr = [];
             foreach ($attributes as $k => $v) {
-                foreach ($v['value'] as $kk => $vv) {
+                foreach ($v['values'] as $kk => $vv) {
                     $dataArr[$kk] = $v['name'] . '_' . $vv;
                     $results[$kk]['attribute'][$v['name']] = $vv;
                 }
@@ -205,5 +222,30 @@ class ProductService
         }
 
         return $results;
+    }
+
+    /**
+     * 获取商品类目
+     *
+     * @param $categories
+     * @param null $parentId
+     * @return array
+     */
+    function generateCategoryTree($categories, $parentId = null) {
+        if (! $categories) {
+            return [];
+        }
+
+        return $categories
+            ->where('parent_id', $parentId)
+            ->map(function (ProductCategory $category) use ($categories) {
+                $data = new ProductCategoryResource($category);
+
+                if ($hasChildren = $categories->contains('parent_id', $category->id)) {
+                    $data['children'] = $this->generateCategoryTree($categories, $category->id)->toArray();
+                }
+
+                return $data;
+            });
     }
 }

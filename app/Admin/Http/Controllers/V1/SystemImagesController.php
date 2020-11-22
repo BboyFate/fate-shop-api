@@ -33,7 +33,7 @@ class SystemImagesController extends Controller
         $this->validateRequest($request);
 
         $user = $request->user();
-        $result = $uploader->save($request->image, 'systems/images/', $user->id);
+        $result = $uploader->save($request->image, 'systems', $user->id);
 
         $image = new SystemImage([
             'name' => $result['name'],

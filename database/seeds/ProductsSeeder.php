@@ -3,7 +3,7 @@
 use App\Models\SystemImage;
 use Illuminate\Database\Seeder;
 use App\Models\Product;
-use App\Models\ProductSkuTemplate;
+use App\Models\ProductAttributeTemplate;
 
 class ProductsSeeder extends Seeder
 {
@@ -19,17 +19,17 @@ class ProductsSeeder extends Seeder
 
         foreach ($products as $product) {
             $image = SystemImage::query()->inRandomOrder()->first();
-            $template = ProductSkuTemplate::query()->inRandomOrder()->first();
+            $template = ProductAttributeTemplate::query()->inRandomOrder()->first();
 
             // SKU 多规格
             $productSkuAttributesData = [];
-            foreach ($template->value as $data) {
+            foreach ($template->attributes as $data) {
                 $productSkuAttributesData[] = [
-                    'name'  => $data['name'],
-                    'value' => $data['attributes'],
+                    'name'   => $data['name'],
+                    'values' => $data['values'],
                 ];
             }
-            $skuAttributes = $product->skuAttributes()->createMany($productSkuAttributesData);
+            $skuAttributes = $product->attributes()->createMany($productSkuAttributesData);
 
             $formatted = (new \App\Services\ProductService)->formatAttributes($skuAttributes);
 

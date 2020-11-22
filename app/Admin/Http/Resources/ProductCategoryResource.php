@@ -34,6 +34,10 @@ class ProductCategoryResource extends JsonResource
             $data['full_name'] = $this->full_name;
         }
 
+        if ($this->children) {
+            $data['children'] = $this->children;
+        }
+
         return $data;
     }
 

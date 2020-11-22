@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
         $this->call(AdminVueMenusSeeder::class);
         $this->call(AdminUsersSeeder::class);
         $this->call(UserAddressesSeeder::class);
-        $this->call(ProductSkuTemplatesSeeder::class);
+        $this->call(ProductAttributeTemplatesSeeder::class);
         $this->call(ProductCategoriesSeeder::class);
         $this->call(ProductsSeeder::class);
         $this->call(OrdersSeeder::class);

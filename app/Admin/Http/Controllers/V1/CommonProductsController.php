@@ -2,6 +2,8 @@
 
 namespace App\Admin\Http\Controllers\V1;
 
+use App\Admin\Http\Resources\ProductDetailResource;
+use App\Models\ProductAttributeTemplate;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -22,11 +24,11 @@ abstract class CommonProductsController extends Controller
         $builder = (new ProductSearchBuilder())->productType($this->getProductType())->paginate((int) $perPage, (int) $page);
 
         // 排序
-        if ($order = $request->input('order', '')) {
+        if ($order = $request->input('order', 'id_desc')) {
             // 是否是以 _asc 或者 _desc 结尾
             if (preg_match('/^(.+)_(asc|desc)$/', $order, $m)) {
                 // 如果字符串的开头是这 3 个字符串之一，说明是一个合法的排序值
-                if (in_array($m[1], ['price', 'sold_count', 'rating'])) {
+                if (in_array($m[1], ['id', 'price', 'sold_count', 'rating'])) {
                     $builder->orderBy($m[1], $m[2]);
                 }
             }
@@ -96,11 +98,12 @@ abstract class CommonProductsController extends Controller
         $productData = $request->only([
             'title',
             'long_title',
+            'number',
             'description',
             'on_sale',
             'category_id',
             'image',
-            'sku_attributes',
+            'attributes',
             'skus',
         ]);
         $productData['type'] = $this->getProductType();
@@ -111,25 +114,26 @@ abstract class CommonProductsController extends Controller
 
         $product = $service->store($productData);
 
-        $product->load('category', 'skus', 'skuAttributes', 'crowdfunding');
+        $product->load('category', 'skus', 'attributes', 'crowdfunding', 'description');
 
         return $this->response->created(new ProductResource($product));
     }
 
     public function update(Request $request, $id, ProductService $service)
     {
-        $product = Product::query()->with(['category', 'skus', 'skuAttributes', 'crowdfunding'])->findOrFail($id);
+        $product = Product::query()->with(['category', 'skus', 'attributes', 'crowdfunding'])->findOrFail($id);
 
         $this->validateRequest($request, 'requestValidation');
 
         $productData = $request->only([
             'title',
             'long_title',
+            'number',
             'description',
             'on_sale',
             'category_id',
             'image',
-            'sku_attributes',
+            'attributes',
             'skus',
         ]);
         $productData['type'] = $this->getProductType();
@@ -140,7 +144,7 @@ abstract class CommonProductsController extends Controller
 
         $product = $service->update($product, $productData);
 
-        $product->load('category', 'skus', 'skuAttributes');
+        $product->load('category', 'skus', 'attributes', 'crowdfunding', 'description');
 
         return $this->response->success(new ProductResource($product));
     }
@@ -148,7 +152,7 @@ abstract class CommonProductsController extends Controller
     public function show($id)
     {
         $product = QueryBuilder::for(Product::class)
-            ->allowedIncludes(['category', 'skus', 'skuAttributes', 'crowdfunding'])
+            ->allowedIncludes(['category', 'skus', 'attributes', 'crowdfunding'])
             ->findOrFail($id);
 
         return $this->response->success(new ProductResource($product));
@@ -162,5 +166,30 @@ abstract class CommonProductsController extends Controller
         $product->delete();
 
         return $this->response->noContent();
+    }
+
+    /**
+     * 商品详情页
+     *
+     * @param $id
+     * @param Request $request
+     * @param ProductService $service
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function detail($id, ProductService $service)
+    {
+        $product = QueryBuilder::for(Product::class)
+            ->allowedIncludes(['category', 'skus', 'attributes', 'crowdfunding', 'description'])
+            ->whereId($id)
+            ->first();
+
+        $categories = $service->generateCategoryTree(ProductCategory::query()->get());
+        $attributeTemplates = ProductAttributeTemplate::query()->get();
+
+        $result = (new ProductDetailResource($product))
+            ->setCategories($categories)
+            ->setAttributeTemplates($attributeTemplates);
+
+        return $this->response->success($result);
     }
 }

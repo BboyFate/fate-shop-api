@@ -20,6 +20,7 @@ class CreateProductsTable extends Migration
             $table->foreign('category_id')->references('id')->on('product_categories')->onDelete('set null');
             $table->string('title')->comment('商品短标题');
             $table->string('long_title')->comment('商品长标题');
+            $table->string('number', 64)->default('')->comment('商品货号');
             $table->string('image')->comment('商品封面图片');
             $table->string('banners')->comment('商品轮播图');
             $table->boolean('on_sale')->default(true)->comment('商品是否正在售卖');

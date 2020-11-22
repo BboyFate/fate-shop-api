@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateProductDescriptionsTable extends Migration
+class CreateProductAttributes extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,14 @@ class CreateProductDescriptionsTable extends Migration
      */
     public function up()
     {
-        Schema::create('product_descriptions', function (Blueprint $table) {
+        Schema::create('product_attributes', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('product_id')->index();
-            $table->text('description')->comment('商品详情');
+            $table->string('name')->comment('SKU 规格名称');
+            $table->json('values')->comment('SKU 规格值');
         });
+
+        DB::statement("ALTER TABLE `product_attributes` COMMENT='商品规格'");
     }
 
     /**
@@ -27,6 +30,6 @@ class CreateProductDescriptionsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('product_descriptions');
+        Schema::dropIfExists('product_attributes');
     }
 }

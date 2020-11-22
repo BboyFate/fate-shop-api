@@ -47,7 +47,7 @@ class ProductCategory extends Model
 
     public function skuAttributes()
     {
-        return $this->hasMany(ProductSkuAttribute::class, 'product_category_id');
+        return $this->hasMany(ProductAttribute::class, 'product_category_id');
     }
 
     /**
@@ -90,5 +90,16 @@ class ProductCategory extends Model
         ->pluck('name') // 取出所有祖先类目的 name 字段作为一个数组
         ->push($this->name) // 将当前类目的 name 字段值加到数组的末尾
         ->implode(' - '); // 用 - 符号将数组的值组装成一个字符串
+    }
+
+    /**
+     * 访问器 获取当前的子类目
+     * 预防 N + 1 查询，如果 attributes 属性已有则返回
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function getChildrenAttribute()
+    {
+        return $this->attributes['children'] ?? [];
     }
 }
