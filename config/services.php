@@ -40,10 +40,10 @@ return [
         ],
     ],
 
-    'weixin' => [
+    'wechat' => [
         'client_id' => env('WECHAT_APP_ID'),
         'client_secret' => env('WECHAT_APP_SECRET'),
-        'redirect' => env('WEIXIN_REDIRECT_URI')
+        'redirect' => env('WECHAT_REDIRECT_URI')
     ],
 
 ];

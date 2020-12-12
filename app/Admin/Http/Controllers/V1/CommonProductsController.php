@@ -2,16 +2,17 @@
 
 namespace App\Admin\Http\Controllers\V1;
 
-use App\Admin\Http\Resources\ProductDetailResource;
-use App\Models\ProductAttributeTemplate;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Spatie\QueryBuilder\QueryBuilder;
 use App\Admin\Http\Resources\ProductResource;
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Models\ProductAttributeTemplate;
 use App\SearchBuilders\ProductSearchBuilder;
 use App\Services\ProductService;
+use App\Services\ProductCategoryService;
+use App\Admin\Http\Resources\ProductDetailResource;
 
 abstract class CommonProductsController extends Controller
 {
@@ -163,7 +164,11 @@ abstract class CommonProductsController extends Controller
     public function destroy($id)
     {
         $product = Product::query()->findOrFail($id);
-        $product->delete();
+
+        \DB::transaction(function () use ($product) {
+            $product->delete();
+            $product->skus()->delete();
+        });
 
         return $this->response->noContent();
     }
@@ -172,18 +177,17 @@ abstract class CommonProductsController extends Controller
      * 商品详情页
      *
      * @param $id
-     * @param Request $request
-     * @param ProductService $service
+     * @param ProductCategoryService $productCategoryService
      * @return \Illuminate\Http\JsonResponse
      */
-    public function detail($id, ProductService $service)
+    public function detail($id, ProductCategoryService $productCategoryService)
     {
         $product = QueryBuilder::for(Product::class)
             ->allowedIncludes(['category', 'skus', 'attributes', 'crowdfunding', 'description'])
             ->whereId($id)
             ->first();
 
-        $categories = $service->generateCategoryTree(ProductCategory::query()->get());
+        $categories = $productCategoryService->generateCategoriesTree($productCategoryService->getCategories());
         $attributeTemplates = ProductAttributeTemplate::query()->get();
 
         $result = (new ProductDetailResource($product))

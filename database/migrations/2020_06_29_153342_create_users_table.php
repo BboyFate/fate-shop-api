@@ -21,8 +21,7 @@ class CreateUsersTable extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->nullable();
             $table->string('avatar')->nullable();
-            $table->string('weixin_openid')->unique()->nullable();
-            $table->string('weixin_unionid')->unique()->nullable();
+            $table->string('registered_source', 32)->comment('注册来源');
             $table->dateTime('created_at');
             $table->dateTime('updated_at');
             $table->dateTime('last_actived_at')->nullable();

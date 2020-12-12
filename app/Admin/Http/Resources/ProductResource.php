@@ -30,7 +30,7 @@ class ProductResource extends JsonResource
             'created_at'   => (string)$this->created_at,
             'updated_at'   => (string)$this->updated_at,
             'description'  => new ProductDescriptionResource($this->whenLoaded('description')),
-            'category'     => (new ProductCategoryResource($this->whenLoaded('category')))->showFullNameField(),
+            'category'     => new ProductCategoryResource($this->whenLoaded('category')),
             'skus'         => ProductSkuResource::collection($this->whenLoaded('skus')),
             'attributes'   => ProductAttributeResource::collection($this->whenLoaded('attributes')),
             'crowdfunding' => new CrowdfundingProductResource($this->whenLoaded('crowdfunding')),

@@ -16,8 +16,7 @@ class CreateProductsTable extends Migration
         Schema::create('products', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('type')->default(\App\Models\Product::TYPE_NORMAL)->index();
-            $table->unsignedBigInteger('category_id')->nullable();
-            $table->foreign('category_id')->references('id')->on('product_categories')->onDelete('set null');
+            $table->unsignedBigInteger('category_id')->index();
             $table->string('title')->comment('商品短标题');
             $table->string('long_title')->comment('商品长标题');
             $table->string('number', 64)->default('')->comment('商品货号');

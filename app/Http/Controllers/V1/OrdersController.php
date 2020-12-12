@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\V1;
+namespace App\Http\Controllers\V1;
 
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;

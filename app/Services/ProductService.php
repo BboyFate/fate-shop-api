@@ -2,9 +2,7 @@
 
 namespace App\Services;
 
-use App\Admin\Http\Resources\ProductCategoryResource;
 use App\Models\Product;
-use App\Models\ProductCategory;
 
 class ProductService
 {
@@ -222,30 +220,5 @@ class ProductService
         }
 
         return $results;
-    }
-
-    /**
-     * 获取商品类目
-     *
-     * @param $categories
-     * @param null $parentId
-     * @return array
-     */
-    function generateCategoryTree($categories, $parentId = null) {
-        if (! $categories) {
-            return [];
-        }
-
-        return $categories
-            ->where('parent_id', $parentId)
-            ->map(function (ProductCategory $category) use ($categories) {
-                $data = new ProductCategoryResource($category);
-
-                if ($hasChildren = $categories->contains('parent_id', $category->id)) {
-                    $data['children'] = $this->generateCategoryTree($categories, $category->id)->toArray();
-                }
-
-                return $data;
-            });
     }
 }

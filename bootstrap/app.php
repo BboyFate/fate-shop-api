@@ -70,6 +70,7 @@ $app->configure('views');
 $app->configure('easysms');
 $app->configure('permission');
 $app->configure('query-builder');
+$app->configure('wechat');
 
 /*
 |--------------------------------------------------------------------------
@@ -122,7 +123,8 @@ $app->register(App\Providers\EventServiceProvider::class);
  */
 $app->register(Tymon\JWTAuth\Providers\LumenServiceProvider::class);
 $app->register(Overtrue\LaravelLang\TranslationServiceProvider::class);
-$app->register(SocialiteProviders\Manager\ServiceProvider::class);
+$app->register(Overtrue\LaravelSocialite\ServiceProvider::class);
+$app->register(Overtrue\LaravelWeChat\ServiceProvider::class);
 $app->register(Illuminate\Redis\RedisServiceProvider::class);
 $app->register(Yansongda\LaravelPay\PayServiceProvider::class);
 $app->register(Intervention\Image\ImageServiceProviderLumen::class);

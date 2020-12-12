@@ -38,6 +38,15 @@ class Product extends Model
         'banners' => 'array',
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function (Product $product) {
+            $product->skus()->delete();
+        });
+    }
+
     public function category()
     {
         return $this->belongsTo(ProductCategory::class);

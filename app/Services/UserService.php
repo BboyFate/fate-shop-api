@@ -2,42 +2,69 @@
 
 namespace App\Services;
 
-use App\Models\User;
 use Illuminate\Support\Str;
+use App\Models\User;
+use App\Models\UserSocial;
 
 class UserService
 {
     /**
-     * 手机号码或邮箱密码登录
+     * 微信小程序登录逻辑
      *
-     * @param $phoneOrEmail
-     * @param $password
-     * @return bool
+     * @param User $user
+     * @param $weappData
+     * @return User
+     * @throws \Exception
      */
-    public function phoneOrEmailLogin($phoneOrEmail, $password)
+    public function weappLogin(User $user, $weappData)
     {
-        filter_var($phoneOrEmail, FILTER_VALIDATE_EMAIL)
-            ? $credentials['email'] = $phoneOrEmail
-            : $credentials['phone'] = $phoneOrEmail;
-        $credentials['password'] = $password;
+        $socialConditions = [
+            'social_type' => UserSocial::TYPE_WEAPP,
+            'openid'      => $weappData['openid'],
+        ];
+        $social = UserSocial::query()->where($socialConditions)->first();
 
-        return \Auth::attempt($credentials);
+        if ($social) {
+            if ($social->user_id != $user->id) {
+                // 当前第三方已绑定过其他用户，需要删除
+                // 当前第三方关联到当前用户
+                $social->user()->associate($user);
+                $social->save([
+                    'extra' => ['weapp_session_key' => $weappData['session_key']]
+                ]);
+            }
+        } else {
+            $userSocial = $user->socials()->where('social_type', UserSocial::TYPE_WEAPP)->first();
+
+            // 当前用户已绑定过该第三方平台
+            if ($userSocial) {
+                $userSocial->delete();
+            }
+
+            $user = $this->socialStore($user, UserSocial::TYPE_WEAPP, $weappData['openid'], ['weapp_session_key' => $weappData['session_key']]);
+        }
+
+        return $user;
     }
 
     /**
-     * @param $phone
-     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|object|null
+     * 用户账号创建第三方关联
+     *
+     * @param User $user
+     * @param $socialType 第三方平台
+     * @param $openid 第三方唯一ID
+     * @param null $extra 其他数据
+     * @param string $unionid 第三方平台关联唯一ID
+     * @return User
      */
-    public function phoneRegister($phone)
+    public function socialStore(User $user, $socialType, $openid, $extra = null, $unionid = '')
     {
-        $user = User::query()->where('phone', $phone)->first();
-
-        if (empty($user)) {
-            $user = User::query()->create([
-                'nickname' => '用户_' . Str::random(8),
-                'phone' => $phone,
-            ]);
-        }
+        $user->socials()->create([
+            'social_type' => $socialType,
+            'openid'      => $openid,
+            'extra'       => $extra,
+            'unionid'     => $unionid
+        ]);
 
         return $user;
     }

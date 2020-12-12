@@ -12,6 +12,16 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
 {
     use Authenticatable, Authorizable;
 
+    const REGISTER_WECHAT = 'wechat';
+    const REGISTER_WEAPP  = 'weapp';
+    const REGISTER_H5     = 'h5';
+
+    public static $registerMap = [
+        self::REGISTER_WECHAT => '微信公众号',
+        self::REGISTER_WEAPP  => '微信小程序',
+        self::REGISTER_H5     => 'H5',
+    ];
+
     /**
      * The attributes that are mass assignable.
      *
@@ -23,8 +33,11 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         'email',
         'password',
         'avatar',
-        'weixin_openid',
-        'weixin_unionid',
+        'wechat_openid',
+        'wechat_unionid',
+        'weapp_openid',
+        'weapp_session_key',
+        'registered_source',
     ];
 
     /**
@@ -71,5 +84,10 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     public function cartItems()
     {
         return $this->hasMany(CartItem::class);
+    }
+
+    public function socials()
+    {
+        return $this->hasMany(UserSocial::class);
     }
 }

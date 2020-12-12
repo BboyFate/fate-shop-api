@@ -2,64 +2,61 @@
 
 namespace App\Admin\Http\Controllers\V1;
 
+use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Admin\Http\Resources\ProductCategoryResource;
+use App\Admin\Http\Resources\ProductCategoryCollection;
 use App\Models\ProductCategory;
+use App\Services\ProductCategoryService;
 
 class ProductCategoriesController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request, ProductCategoryService $productCategoryService)
     {
+        $limit = $request->input('limit', 10);
         $builder = ProductCategory::query();
 
         // 关键词搜索
         if ($search = $request->input('search', '')) {
             $like = '%' . $search . '%';
-            $builder->where(function ($query) use ($like) {
-                $query->where('province', 'like', $like)
-                    ->orWhere('city', 'like', $like)
-                    ->orWhere('district', 'like', $like)
-                    ->orWhere('address', 'like', $like)
-                    ->orWhere('contact_name', 'like', $like)
-                    ->orWhere('contact_phone', 'like', $like);
+            $builder->whereHas('children', function ($query) use ($like) {
+                $query->where('name', 'like', $like);
             });
         }
 
-        $users = $builder->paginate();
+        $categories = $builder->paginate($limit);
+        $categoriesTree = $productCategoryService->generateCategoriesTree(ProductCategory::query()->get());
 
-        return $this->response->success(ProductCategoryResource::collection($users));
+        $result = (new ProductCategoryCollection($categories))
+            ->setCategoriesTree($categoriesTree);
+
+        return $this->response->success($result);
     }
 
     public function store(Request $request)
     {
         $this->validateRequest($request);
 
-        $name = $request->input('name');
-        $categoryParent = ProductCategory::query()->find($request->input('parent_id', 0));
-        $attributes = $request->input('attributes');
+        $requestData = $request->only([
+            'name',
+            'parent_id',
+            'image',
+            'sorted',
+            'is_showed',
+        ]);
 
-        $category = \DB::transaction(function () use ($name, $isDirectory, $categoryParent, $attributes) {
+        $category = \DB::transaction(function () use ($requestData) {
             $category = new ProductCategory([
-                'name'         => $name,
-                'is_directory' => $isDirectory
+                'name'      => $requestData['name'],
+                'image'     => $requestData['image'] ?? '',
+                'sorted'    => $requestData['sorted'],
+                'is_showed' => $requestData['is_showed'],
             ]);
-
-            if ($categoryParent) {
-                $category->parent()->associate($categoryParent);
-            }
 
             $category->save();
 
-            // 创建商品规格属性，用于多维度 SKU
-            if ($attributes) {
-                $data = [];
-                foreach ($attributes as $attribute) {
-                    $data[] = [
-                        'name' => $attribute['name']
-                    ];
-                }
-
-                $category->skuAttributes()->createMany($attributes);
+            if ($categoryParent = ProductCategory::query()->find($requestData['parent_id'])) {
+                $category->parent()->associate($categoryParent);
             }
 
             return $category;
@@ -73,23 +70,27 @@ class ProductCategoriesController extends Controller
         $category = ProductCategory::query()->findOrFail($id);
         $this->validateRequest($request);
 
-        $name = $request->input('name');
-        $attributes = $request->input('attributes');
+        $requestData = $request->only([
+            'name',
+            'parent_id',
+            'image',
+            'sorted',
+            'is_showed',
+        ]);
 
-        $category = \DB::transaction(function () use ($category, $name, $attributes) {
-            $category->update([
-                'name' => $name,
-            ]);
+        $category = \DB::transaction(function () use ($category, $requestData) {
+            $category->name = $requestData['name'];
+            $category->image = $requestData['image'] ?? '';
+            $category->sorted = $requestData['sorted'];
+            $category->is_showed = $requestData['is_showed'];
 
-            if ($attributes) {
-                // 更新商品规格属性，用于多维度 SKU
-                foreach ($attributes as $attribute) {
-                    $category->skuAttributes()->updateOrCreate(
-                        ['id' => $attribute['id']],
-                        ['name' => $attribute['name']]
-                    );
-                }
+            if ($categoryParent = ProductCategory::query()->find($requestData['parent_id'])) {
+                $category->parent()->associate($categoryParent);
             }
+
+            $category->save();
+
+            (new ProductCategoryService)->updateChildrenPath($category);
 
             return $category;
         });
@@ -97,11 +98,31 @@ class ProductCategoriesController extends Controller
         return $this->response->success(new ProductCategoryResource($category));
     }
 
-    public function destroy($id)
+    public function destroy($id, ProductCategoryService $productCategoryService)
     {
         $category = ProductCategory::query()->findOrFail($id);
-        $category->delete();
+
+        $ids = $productCategoryService->getCategoryChildrenIds($category);
+        $product = Product::query()->whereIn('category_id', $ids)->first();
+        if ($product) {
+            return $this->response->errorBadRequest('该分类下有商品');
+        }
+
+        $category->delete($ids);
 
         return $this->response->noContent();
+    }
+
+    /**
+     * 类目格式化成有子类目项
+     *
+     * @param ProductCategoryService $productCategoryService
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function categoriesTree(ProductCategoryService $productCategoryService)
+    {
+        $categoriesTree = $productCategoryService->generateCategoriesTree(ProductCategory::query()->get());
+
+        return $this->response->success($categoriesTree);
     }
 }

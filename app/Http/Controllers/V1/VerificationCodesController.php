@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\V1;
+namespace App\Http\Controllers\V1;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -14,12 +14,12 @@ class VerificationCodesController extends Controller
      *
      * @param Request $request
      * @param EasySms $easySms
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\JsonResponse|void
      * @throws \Overtrue\EasySms\Exceptions\InvalidArgumentException
      */
-    public function store(Request $request, EasySms $easySms)
+    public function smsStore(Request $request, EasySms $easySms)
     {
-        $this->validateRequest($request, $this->storeRequestValidationRules());
+        $this->validateRequest($request);
 
         $phone = $request->phone;
 
@@ -47,18 +47,8 @@ class VerificationCodesController extends Controller
         \Cache::put($key, ['phone' => $phone, 'code' => $code], $expiredAt);
 
         return $this->response->created([
-            'key' => $key,
+            'key'        => $key,
             'expired_at' => $expiredAt->toDateTimeString(),
         ]);
-    }
-
-    protected function storeRequestValidationRules()
-    {
-        return [
-            'phone' => [
-                'required',
-                'regex:/^((13[0-9])|(14[5,7])|(15[0-3,5-9])|(17[0,3,5-8])|(18[0-9])|166|198|199)\d{8}$/',
-            ]
-        ];
     }
 }

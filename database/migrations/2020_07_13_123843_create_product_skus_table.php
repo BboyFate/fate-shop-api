@@ -15,8 +15,7 @@ class CreateProductSkusTable extends Migration
     {
         Schema::create('product_skus', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedBigInteger('product_id');
-            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
+            $table->unsignedBigInteger('product_id')->index();
             $table->string('name')->comment('SKU 名称');
             $table->string('image')->comment('SKU 图片');
             $table->decimal('price', 10, 2)->comment('SKU 价格');
@@ -24,6 +23,7 @@ class CreateProductSkusTable extends Migration
             $table->json('attributes');
             $table->dateTime('created_at');
             $table->dateTime('updated_at');
+            $table->softDeletes();
         });
     }
 

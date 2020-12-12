@@ -20,7 +20,7 @@ use Faker\Generator as Faker;
 
 $factory->define(Product::class, function (Faker $faker) {
     // 从数据库中随机取一个类目
-    $category = ProductCategory::query()->where('is_directory', false)->inRandomOrder()->first();
+    $category = ProductCategory::query()->where('level', '>', 0)->inRandomOrder()->first();
 
     $image = SystemImage::query()->inRandomOrder()->first();
 

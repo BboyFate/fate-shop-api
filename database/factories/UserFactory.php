@@ -4,6 +4,7 @@
 
 use Illuminate\Support\Str;
 use Faker\Generator as Faker;
+use App\Models\User;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,11 +17,12 @@ use Faker\Generator as Faker;
 |
 */
 
-$factory->define(\App\Models\User::class, function (Faker $faker) {
+$factory->define(User::class, function (Faker $faker) {
     return [
         'nickname'          => $faker->name,
         'email'             => $faker->unique()->safeEmail,
         'email_verified_at' => \Illuminate\Support\Carbon::now(),
         'password'          => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
+        'registered_source' => $faker->randomElement(array_keys(User::$registerMap)),
     ];
 });

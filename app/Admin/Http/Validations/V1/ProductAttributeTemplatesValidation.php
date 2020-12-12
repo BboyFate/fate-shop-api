@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Admin\Http\Validations\V1;
+
 use Illuminate\Support\Arr;
 
 class ProductAttributeTemplatesValidation

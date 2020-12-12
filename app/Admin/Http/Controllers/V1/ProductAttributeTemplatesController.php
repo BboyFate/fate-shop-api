@@ -47,7 +47,7 @@ class ProductAttributeTemplatesController extends Controller
         $template = ProductAttributeTemplate::query()->findOrFail($id);
         $this->validateRequest($request);
 
-        $template->save($request->only(['name, attributes']));
+        $template->update($request->only(['name', 'attributes']));
 
         return $this->response->success(new ProductAttributeTemplateResource($template));
     }

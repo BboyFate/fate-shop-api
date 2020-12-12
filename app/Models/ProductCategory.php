@@ -4,19 +4,27 @@ namespace App\Models;
 
 class ProductCategory extends Model
 {
-    protected $fillable = ['name', 'is_directory', 'level', 'path'];
+    protected $fillable = [
+        'name',
+        'image',
+        'level',
+        'path',
+        'sorted',
+        'is_showed'
+    ];
 
     protected $casts = [
-        'is_directory' => 'boolean',
+        'is_showed'    => 'boolean',
     ];
 
     protected static function boot()
     {
         parent::boot();
+
         // 监听 Category 的创建事件，用于初始化 path 和 level 字段值
-        static::creating(function (ProductCategory $category) {
+        static::saving(function (ProductCategory $category) {
             // 如果创建的是一个根类目
-            if (is_null($category->parent_id)) {
+            if (! $category->parent_id) {
                 // 将层级设为 0
                 $category->level = 0;
                 // 将 path 设为 -

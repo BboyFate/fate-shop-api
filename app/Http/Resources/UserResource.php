@@ -28,7 +28,7 @@ class UserResource extends JsonResource
         $data = parent::toArray($request);
 
         $data['bound_phone'] = $this->resource->phone ? true : false;
-        $data['bound_wechat'] = ($this->resource->weixin_unionid || $this->resource->weixin_openid) ? true : false;
+        $data['bound_wechat'] = ($this->resource->wechat_unionid || $this->resource->wechat_openid) ? true : false;
 
         return $data;
     }

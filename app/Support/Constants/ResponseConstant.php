@@ -26,7 +26,7 @@ class ResponseConstant
     const SERVICE_LOGIN_SUCCESS = 200102;
 
     // 客户端错误码：400 ~ 499 开头，后拼接 3 位
-    const CLIENT_PARAMETER_ERROR = 400001;
+    const CLIENT_SOCIAL_BIND_ERROR = 400001;
 
     // 服务端操作错误码：500 ~ 599 开头，后拼接 3 位
     const SYSTEM_ERROR = 500001;

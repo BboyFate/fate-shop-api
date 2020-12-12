@@ -15,8 +15,7 @@ class CreateProductPropertiesTable extends Migration
     {
         Schema::create('product_properties', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedBigInteger('product_id');
-            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
+            $table->unsignedBigInteger('product_id')->index();
             $table->string('name')->comment('属性名称');
             $table->string('value')->comment('属性值');
         });

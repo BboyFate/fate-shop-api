@@ -111,7 +111,7 @@ $router->group([
             $router->get('products/{id:[0-9]+}', ['uses' => 'ProductsController@show', 'as' => 'api.v1.admin.products.show']);
             $router->post('products', ['uses' => 'ProductsController@store', 'as' => 'api.v1.admin.products.store']);
             $router->patch('products/{id:[0-9]+}', ['uses' => 'ProductsController@update', 'as' => 'api.v1.admin.products.update']);
-            $router->delete('products/{product:[0-9]+}', ['uses' => 'ProductsController@destroy', 'as' => 'api.v1.admin.products.destroy']);
+            $router->delete('products/{id:[0-9]+}', ['uses' => 'ProductsController@destroy', 'as' => 'api.v1.admin.products.destroy']);
 
             /**
              * 众筹商品
@@ -120,7 +120,7 @@ $router->group([
             $router->get('crowdfunding_products/{id:[0-9]+}', ['uses' => 'CrowdfundingProductsController@show', 'as' => 'api.v1.admin.crowdfunding_products.show']);
             $router->post('crowdfunding_products', ['uses' => 'CrowdfundingProductsController@store', 'as' => 'api.v1.admin.crowdfunding_products.store']);
             $router->patch('crowdfunding_products/{id:[0-9]+}', ['uses' => 'CrowdfundingProductsController@update', 'as' => 'api.v1.admin.crowdfunding_products.update']);
-            $router->delete('crowdfunding_products/{product:[0-9]+}', ['uses' => 'CrowdfundingProductsController@destroy', 'as' => 'api.v1.admin.crowdfunding_products.destroy']);
+            $router->delete('crowdfunding_products/{id:[0-9]+}', ['uses' => 'CrowdfundingProductsController@destroy', 'as' => 'api.v1.admin.crowdfunding_products.destroy']);
 
             $router->get('products/{id:[0-9]+}/detail', ['uses' => 'ProductsController@detail', 'as' => 'api.v1.admin.products.detail']);
 
@@ -138,10 +138,11 @@ $router->group([
          */
         $router->group([], function ($router) {
             $router->get('product_categories', ['uses' => 'ProductCategoriesController@index', 'as' => 'api.v1.admin.product_categories.index']);
+            $router->get('product_categories_tree/', ['uses' => 'ProductCategoriesController@categoriesTree', 'as' => 'api.v1.admin.product_categories_tree.index']);
             $router->get('product_categories/{id:[0-9]+}', ['uses' => 'ProductCategoriesController@show', 'as' => 'api.v1.admin.product_categories.show']);
             $router->post('product_categories', ['uses' => 'ProductCategoriesController@store', 'as' => 'api.v1.admin.product_categories.store']);
             $router->patch('product_categories/{id:[0-9]+}', [ 'uses' => 'ProductCategoriesController@update', 'as' => 'api.v1.admin.product_categories.update']);
-            $router->delete('product_categories/{product:[0-9]+}', ['uses' => 'ProductCategoriesController@destroy', 'as' => 'api.v1.admin.product_categories.destroy']);
+            $router->delete('product_categories/{id:[0-9]+}', ['uses' => 'ProductCategoriesController@destroy', 'as' => 'api.v1.admin.product_categories.destroy']);
         });
 
         /**
@@ -164,6 +165,5 @@ $router->group([
             $router->patch('orders/{order:[0-9]+}/ship', ['uses' => 'OrdersController@ship', 'as' => 'api.v1.admin.orders.ship']);
             $router->patch('orders/{order:[0-9]+}/refund', ['uses' => 'OrdersController@refund', 'as' => 'api.v1.admin.orders.refund']);
         });
-
     });
 });

@@ -170,26 +170,42 @@ class Response
     }
 
     /**
-     * @param \Illuminate\Http\JsonResponse|array|null $data
+     * @param null $data
      * @param string $message
-     * @param int $code
      * @param array $headers
-     * @param int $option
-     * @return \Illuminate\Http\JsonResponse
+     * @param int $options
+     * @return \Illuminate\Http\JsonResponse|JsonResource
      */
-    public function success($data = null, string $message = '', array $headers = [], $option = 0)
+    public function success($data = null, string $message = '', array $headers = [], $options = 0)
     {
-        $message = (! $message && isset(HttpResponse::$statusTexts[$this->httpCode])) ? HttpResponse::$statusTexts[$this->httpCode] : 'OK';
-        $additionalData = [
-            'status' => 'success',
-            'message' => $message
-        ];
-
         if ($data instanceof JsonResource) {
+            $additionalData = [
+                'status' => 'success',
+                'message' => $this->formatMessage($message),
+            ];
             return $data->additional($additionalData);
         }
 
-        return response()->json(array_merge($additionalData, ['data' => $data ?: (object) $data]), $this->httpCode, $headers, $option);
+        return response()->json(
+            $this->formatData($data, $message),
+            $this->httpCode,
+            $headers,
+            $options
+        );
+        //return response()->json(array_merge($additionalData, ['data' => $data ?: (object) $data]), $this->httpCode, $headers, $option);
+    }
+
+    protected function formatMessage($message)
+    {
+        if (! $message) {
+            if ($this->statusCode) {
+                $message = ResponseConstant::statusTexts($this->statusCode) ?: 'OK';
+            } else {
+                $message = HttpResponse::$statusTexts[$this->httpCode] ?: 'OK';
+            }
+        }
+
+        return $message;
     }
 
     protected function formatData($data, $message)
@@ -206,7 +222,7 @@ class Response
 
         $result = [
             'status'  => $status,
-            'message' => $message ?: ResponseConstant::statusTexts(!empty($this->statusCode) ? $this->statusCode : $this->httpCode),
+            'message' => $this->formatMessage($message),
             'data'    => $data ?: (object) $data,
         ];
 

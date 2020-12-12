@@ -15,10 +15,6 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\ExampleEvent::class => [
             \App\Listeners\ExampleListener::class,
         ],
-        \SocialiteProviders\Manager\SocialiteWasCalled::class => [
-            // add your listeners (aka providers) here
-            'SocialiteProviders\\Weixin\\WeixinExtendSocialite@handle',
-        ],
         // 订单支付完成后的事件
         \App\Events\OrderPaid::class => [
             \App\Listeners\UpdateProductSoldCount::class,   // 更新商品销量

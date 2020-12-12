@@ -7,13 +7,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
 class ProductCategoryResource extends JsonResource
 {
     /**
-     * 默认隐藏分类的所有名称这个字段
-     *
-     * @var bool
-     */
-    protected $showFullNameField = false;
-
-    /**
      * Transform the resource into an array.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -22,34 +15,22 @@ class ProductCategoryResource extends JsonResource
     public function toArray($request)
     {
         $data = [
-            'id'           => $this->id,
-            'name'         => $this->name,
-            'is_directory' => $this->is_directory,
-            'level'        => $this->level,
-            'created_at'   => (string) $this->created_at,
-            'updated_at'   => (string) $this->updated_at,
+            'id'         => $this->id,
+            'name'       => $this->name,
+            'full_name'  => $this->full_name,
+            'parent_id'  => $this->parent_id,
+            'level'      => $this->level,
+            'is_showed'  => $this->is_showed,
+            'image'      => $this->image,
+            'sorted'     => $this->sorted,
+            'created_at' => (string) $this->created_at,
+            'updated_at' => (string) $this->updated_at,
         ];
-
-        if ($this->showFullNameField) {
-            $data['full_name'] = $this->full_name;
-        }
 
         if ($this->children) {
             $data['children'] = $this->children;
         }
 
         return $data;
-    }
-
-    /**
-     * 显示分类的所有名称
-     *
-     * @return $this
-     */
-    public function showFullNameField()
-    {
-        $this->showFullNameField = true;
-
-        return $this;
     }
 }

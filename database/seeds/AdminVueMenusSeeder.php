@@ -157,6 +157,26 @@ class AdminVueMenusSeeder extends Seeder
                             'activeMenu' => '/product/crowdfunding',
                         ],
                     ],
+                    [
+                        'name' => 'ProductCategory',
+                        'path' => '/product/category',
+                        'component' => 'ProductCategory',
+                        'is_showed' => true,
+                        'meta' => [
+                            'icon' => '',
+                            'title' => '商品类目',
+                        ],
+                    ],
+                    [
+                        'name' => 'ProductAttributeTemplate',
+                        'path' => '/product/attribute_template',
+                        'component' => 'ProductAttributeTemplate',
+                        'is_showed' => true,
+                        'meta' => [
+                            'icon' => '',
+                            'title' => '规格模板',
+                        ],
+                    ],
                 ]
             ],
         ];

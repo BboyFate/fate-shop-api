@@ -63,14 +63,12 @@ class ProductCategoriesSeeder extends Seeder
         }
     }
 
-    protected function createCategory($data, $parent = null)
+    protected function createCategory($data, $parent = 0)
     {
         // 创建一个新的类目对象
         $category = new ProductCategory(['name' => $data['name']]);
-        // 如果有 children 字段则代表这是一个父类目
-        $category->is_directory = isset($data['children']);
         // 如果有传入 $parent 参数，代表有父类目
-        if (! is_null($parent)) {
+        if ($parent) {
             $category->parent()->associate($parent);
         }
         //  保存到数据库
