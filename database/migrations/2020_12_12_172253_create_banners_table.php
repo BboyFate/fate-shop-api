@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateProductCategoriesTable extends Migration
+class CreateBannersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,11 @@ class CreateProductCategoriesTable extends Migration
      */
     public function up()
     {
-        Schema::create('product_categories', function (Blueprint $table) {
+        Schema::create('banners', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('name')->comment('类目名');
-            $table->string('image')->comment('类目图片');
-            $table->unsignedBigInteger('parent_id')->default(0)->index();
-            $table->unsignedInteger('level')->comment('当前类目层级');
-            $table->string('path')->comment('该类目的父类目ID，方便搜索');
+            $table->string('name', 32)->comment('名称');
+            $table->string('type', 32)->comment('轮播类型');
+            $table->string('url')->default('')->comment('轮播地址');
             $table->unsignedTinyInteger('sorted')->default(0)->comment('排序');
             $table->boolean('is_showed')->default(true)->comment('显示隐藏');
             $table->dateTime('created_at');
@@ -34,6 +32,6 @@ class CreateProductCategoriesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('product_categories');
+        Schema::dropIfExists('banners');
     }
 }

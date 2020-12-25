@@ -3,6 +3,9 @@
 namespace App\Services;
 
 use App\Models\Product;
+use App\Models\ProductCategory;
+use App\SearchBuilders\ProductSearchBuilder;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class ProductService
 {
@@ -220,5 +223,39 @@ class ProductService
         }
 
         return $results;
+    }
+
+    /**
+     * 热门商品
+     *
+     * @param $page
+     * @param int $perPage
+     * @return mixed
+     */
+    public function getHotProducts($page, $perPage = 10)
+    {
+        $builder = (new ProductSearchBuilder())
+            ->onSale()
+            ->orderBy('sold_count', 'desc')
+            ->paginate($perPage, $page);
+        $result = app('es')->search($builder->getParams());
+
+        $productIds = collect($result['hits']['hits'])->pluck('_id')->all();
+        $products = Product::query()->byIds($productIds)->get();
+
+        $pager = new LengthAwarePaginator($products, $result['hits']['total']['value'], $perPage, $page, [
+            'path' => route('api.v1.products.hot', false)
+        ]);
+
+        return $pager;
+    }
+
+    public function getCategoryTree()
+    {
+        $categories = ProductCategory::query()
+            ->orderBy('sorted', 'desc')
+            ->get(['id', 'name', 'image']);
+
+        return $categories;
     }
 }

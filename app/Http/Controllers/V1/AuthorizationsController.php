@@ -8,6 +8,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 use Overtrue\LaravelSocialite\Socialite;
 use Overtrue\LaravelWeChat\Facade as EasyWeChat;
 use App\Models\User;
@@ -293,9 +294,12 @@ class AuthorizationsController extends Controller
      */
     public function update()
     {
-        $token = Auth::refresh();
-
-        return $this->respondWithToken($token);
+        try {
+            $token = Auth::refresh();
+            return $this->respondWithToken($token);
+        } catch (TokenExpiredException $e) {
+            return $this->response->errorUnauthorized($e->getMessage());
+        }
     }
 
     /**
@@ -305,9 +309,12 @@ class AuthorizationsController extends Controller
      */
     public function destroy()
     {
-        Auth::logout();
-
-        return $this->response->noContent();
+        try {
+            Auth::logout();
+            return $this->response->noContent();
+        } catch (TokenExpiredException $e) {
+            return $this->response->errorUnauthorized($e->getMessage());
+        }
     }
 
     /**

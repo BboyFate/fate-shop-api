@@ -72,8 +72,8 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     public function favoriteProducts()
     {
         return $this->belongsToMany(Product::class, 'user_favorite_products')
-            ->withTimestamps()
-            ->orderBy('user_favorite_products.created_at', 'desc');
+            ->withTimestamps();
+            //->orderBy('user_favorite_products.created_at', 'desc');
     }
 
     public function addresses()
@@ -83,7 +83,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
 
     public function cartItems()
     {
-        return $this->hasMany(CartItem::class);
+        return $this->hasMany(UserCartItem::class);
     }
 
     public function socials()

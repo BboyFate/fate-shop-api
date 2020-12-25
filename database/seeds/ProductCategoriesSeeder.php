@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Seeder;
 use App\Models\ProductCategory;
+use App\Models\SystemImage;
 
 class ProductCategoriesSeeder extends Seeder
 {
@@ -65,8 +66,12 @@ class ProductCategoriesSeeder extends Seeder
 
     protected function createCategory($data, $parent = 0)
     {
+        $image = SystemImage::query()->inRandomOrder()->first();
         // 创建一个新的类目对象
-        $category = new ProductCategory(['name' => $data['name']]);
+        $category = new ProductCategory([
+            'name' => $data['name'],
+            'image' => $image->path
+        ]);
         // 如果有传入 $parent 参数，代表有父类目
         if ($parent) {
             $category->parent()->associate($parent);

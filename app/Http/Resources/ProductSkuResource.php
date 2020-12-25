@@ -14,6 +14,14 @@ class ProductSkuResource extends JsonResource
      */
     public function toArray($request)
     {
-        return parent::toArray($request);
+        return [
+            'id'         => $this->id,
+            'product_id' => $this->product_id,
+            'name'       => $this->name,
+            'image'      => $this->image,
+            'price'      => $this->price,
+            'stock'      => $this->stock,
+            'attributes' => $this->attributes,
+        ];
     }
 }

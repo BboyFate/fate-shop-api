@@ -27,6 +27,14 @@ $router->group([
     $router->post('authorizations/sms', ['uses' => 'AuthorizationsController@storeBySms', 'as' => 'api.v1.authorizations.sms_store']);
 
     /**
+     * 授权
+     */
+    // 刷新授权 token
+    $router->put('authorizations/current', ['uses' => 'AuthorizationsController@update', 'as' => 'api.v1.authorizations.update']);
+    // 删除授权
+    $router->delete('authorizations/current', ['uses' => 'AuthorizationsController@destroy', 'as' => 'api.v1.authorizations.destroy']);
+
+    /**
      * 微信小程序
      */
     // 账号密码登录
@@ -35,12 +43,21 @@ $router->group([
     $router->post('weapp/authorizations/sms', ['uses' => 'AuthorizationsController@weappStoreBySms', 'as' => 'api.v1.weapp.authorizations.sms_store']);
     // 手机注册
     $router->post('registrations/weapp/phone', ['uses' => 'UsersController@storeByWeappPhone', 'as' => 'api.v1.weapp.users.store_by_phone']);
+    // 小程序首页
+    $router->get('weapp/index', ['uses' => 'IndexController@weappIndex', 'as' => 'api.v1.weapp.index']);
+
 
     /**
      * 商品
      */
     $router->get('products', ['uses' => 'ProductsController@index', 'as' => 'api.v1.products.index']);
     $router->get('products/{id:[0-9]+}', ['uses' => 'ProductsController@show', 'as' => 'api.v1.products.show']);
+    // 热门商品
+    $router->get('products/hot', ['uses' => 'ProductsController@getHotProduct', 'as' => 'api.v1.products.hot']);
+    // 商品评论列表
+    $router->get('products/{id:[0-9]+}/reviews', ['uses' => 'ProductsController@reviews', 'as' => 'api.v1.products.reviews']);
+    // 商品分类
+    $router->get('product_categories', ['uses' => 'ProductsController@getCategories', 'as' => 'api.v1.product_categories.index']);
 
     /**
      * 支付
@@ -54,13 +71,6 @@ $router->group([
     $router->group([
         'middleware' => 'auth_refresh'
     ], function () use ($router) {
-        /**
-         * 授权
-         */
-        // 刷新授权 token
-        $router->put('authorizations/current', ['uses' => 'AuthorizationsController@update', 'as' => 'api.v1.authorizations.update']);
-        // 删除授权
-        $router->delete('authorizations/current', ['uses' => 'AuthorizationsController@destroy', 'as' => 'api.v1.authorizations.destroy']);
 
         /**
          * 当前用户
@@ -69,11 +79,16 @@ $router->group([
         $router->get('user', ['uses' => 'UsersController@me', 'as' => 'api.v1.user.show']);
 
         /**
-         * 商品
+         * 商品收藏
          */
+        // 收藏列表
         $router->get('products/favorites', ['uses' => 'ProductsController@favorites', 'as' => 'api.v1.products.favorites']);
-        $router->post('products/{product:[0-9]+}/favorite', ['uses' => 'ProductsController@favor', 'as' => 'api.v1.products.favor']);
-        $router->delete('products/{product:[0-9]+}/favorite', ['uses' => 'ProductsController@disfavor', 'as' => 'api.v1.products.disfavor']);
+        // 收藏的某个商品
+        $router->get('products/{productId:[0-9]+}/favorite', ['uses' => 'ProductsController@favorite', 'as' => 'api.v1.products.favorite']);
+        // 添加收藏
+        $router->post('products/{productId:[0-9]+}/favorite', ['uses' => 'ProductsController@favor', 'as' => 'api.v1.products.favor']);
+        // 删除收藏
+        $router->delete('products/{productId:[0-9]+}/favorite', ['uses' => 'ProductsController@disfavor', 'as' => 'api.v1.products.disfavor']);
 
         /**
          * 用户收货地址
@@ -86,9 +101,9 @@ $router->group([
         /**
          * 购物车
          */
-        $router->get('cart', ['uses' => 'CartController@index', 'as' => 'api.v1.cart.index']);
-        $router->post('cart', ['uses' => 'CartController@store', 'as' => 'api.v1.cart.store']);
-        $router->delete('cart/{sku:[0-9]+}', ['uses' => 'CartController@destroy', 'as' => 'api.v1.cart.destroy']);
+        $router->get('user/cart', ['uses' => 'UserCartController@index', 'as' => 'api.v1.user.cart.index']);
+        $router->post('user/cart', ['uses' => 'UserCartController@store', 'as' => 'api.v1.user.cart.store']);
+        $router->delete('user/cart/{sku:[0-9]+}', ['uses' => 'UserCartController@destroy', 'as' => 'api.v1.user.cart.destroy']);
 
         /**
          * 订单

@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\SystemImage;
 use Illuminate\Database\Seeder;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -15,12 +16,17 @@ class OrdersSeeder extends Seeder
         // 被购买的商品，用于后面更新商品销量和评分
         $products = collect([]);
 
+        $image = SystemImage::query()->inRandomOrder()->first();
+
         foreach ($orders as $order) {
             // 每笔订单随机 1 - 3 个商品
             $items = factory(OrderItem::class, random_int(1, 3))->create([
+                'user_id'     => $order->user_id,
                 'order_id'    => $order->id,
                 'rating'      => $order->reviewed ? random_int(1, 5) : null,  // 随机评分 1 - 5
                 'review'      => $order->reviewed ? $faker->sentence : null,
+                'is_verified' => $order->reviewed ? random_int(0, 9) > 2 : false,
+                'images'      => $order->reviewed ? [$image->path] : [],
                 'reviewed_at' => $order->reviewed ? $faker->dateTimeBetween($order->paid_at) : null, // 评价时间不能早于支付时间
             ]);
 

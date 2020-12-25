@@ -82,6 +82,27 @@ class Product extends Model
         return $this->hasOne(SeckillProduct::class);
     }
 
+    public function orderItems($isVerified = true)
+    {
+        $builder = $this->hasMany(OrderItem::class);
+        if ($isVerified !== false) {
+            $builder->where('is_verified', true);
+        }
+        return $builder;
+    }
+
+    /**
+     * 最近的评论
+     * 
+     * @return mixed
+     */
+    public function recentReviews()
+    {
+        return $this->orderItems()
+            ->whereNotNull('reviewed_at')
+            ->recentReviews();
+    }
+
     /**
      * 访问器
      * 商品属性名称分组，属性值集合一起

@@ -66,7 +66,7 @@ class OrderService
 
             // 将下单的商品从购物车中移除
             $skuIds = collect($items)->pluck('sku_id')->all();
-            app(CartService::class)->destroy($skuIds);
+            app(UserCartService::class)->destroy($skuIds);
 
             return $order;
         });

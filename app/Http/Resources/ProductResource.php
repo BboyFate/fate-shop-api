@@ -15,20 +15,20 @@ class ProductResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'id'           => $this->id,
-            'type'         => $this->type,
-            'category_id'  => $this->category_id,
-            'title'        => $this->title,
-            'long_title'   => $this->long_title,
-            'description'  => $this->description,
-            'image'        => $this->image,
-            'rating'       => $this->rating,
-            'sold_count'   => $this->sold_count,
-            'review_count' => $this->review_count,
-            'price'        => $this->price,
-            'created_at'   => $this->created_at->toDateTimeString(),
-            'updated_at'   => $this->updated_at->toDateTimeString(),
-            'skus'         => ProductSkuResource::collection($this->whenLoaded('skus')),
+            'id'             => $this->id,
+            'category_id'    => $this->category_id,
+            'title'          => $this->title,
+            'long_title'     => $this->long_title,
+            'image'          => $this->image,
+            'banners'        => $this->banners,
+            'rating'         => $this->rating,
+            'sold_count'     => $this->sold_count,
+            'review_count'   => $this->review_count,
+            'price'          => $this->price,
+            'description'    => new ProductDescriptionResource($this->whenLoaded('description')),
+            'skus'           => ProductSkuResource::collection($this->whenLoaded('skus')),
+            'attributes'     => ProductAttributeResource::collection($this->whenLoaded('attributes')),
+            'recent_reviews' => OrderItemResource::collection($this->whenLoaded('recentReviews')),
         ];
     }
 }

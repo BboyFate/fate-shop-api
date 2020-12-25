@@ -2,11 +2,17 @@
 
 namespace App\Http\Controllers\V1;
 
+use App\Http\Resources\OrderItemResource;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use App\Models\Product;
+use App\Models\ProductCategory;
+use App\Services\ProductService;
 use App\SearchBuilders\ProductSearchBuilder;
 use App\Http\Resources\ProductResource;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\AllowedInclude;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class ProductsController extends Controller
 {
@@ -19,7 +25,7 @@ class ProductsController extends Controller
     public function index(Request $request)
     {
         $page = $request->input('page', 1);
-        $perPage = 16;
+        $perPage = $request->input('perPage', 10);
         $builder = (new ProductSearchBuilder())->onSale()->paginate($perPage, $page);
 
         // 排序
@@ -62,9 +68,7 @@ class ProductsController extends Controller
         $result = app('es')->search($builder->getParams());
 
         $productIds = collect($result['hits']['hits'])->pluck('_id')->all();
-        $products = Product::query()
-            ->byIds($productIds)
-            ->get();
+        $products = Product::query()->byIds($productIds)->get();
 
         $properties = [];
         // 如果返回结果里有 aggregations 字段，说明做了分面搜索
@@ -93,7 +97,9 @@ class ProductsController extends Controller
      */
     public function show($id)
     {
-        $product = Product::query()->findOrFail($id);
+        $product = QueryBuilder::for(Product::class)
+            ->allowedIncludes(['skus', 'attributes', 'description', 'recentReviews.user'])
+            ->findOrFail($id);
 
         if (! $product->on_sale) {
             return $this->response->errorForbidden('商品已下架');
@@ -116,15 +122,31 @@ class ProductsController extends Controller
     }
 
     /**
+     * @param Request $request
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Resources\Json\JsonResource
+     */
+    public function favorite(Request $request, $productId)
+    {
+        $product = Product::query()->findOrFail($productId, 'id');
+
+        if ($request->user()->favoriteProducts()->find($product->id)) {
+            return new ProductResource($product);
+        }
+
+        return $this->response->noContent();
+    }
+
+    /**
      * 收藏商品
      *
      * @param Request $request
      * @param $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function favor(Request $request, $id)
+    public function favor(Request $request, $productId)
     {
-        $product = Product::query()->findOrFail($id);
+        $product = Product::query()->findOrFail($productId);
         $user = $request->user();
 
         if ($user->favoriteProducts()->find($product->id)) {
@@ -149,5 +171,43 @@ class ProductsController extends Controller
         $request->user()->favoriteProducts()->detach($product);
 
         return $this->response->noContent();
+    }
+
+    /**
+     * 热门商品
+     *
+     * @param Request $request
+     * @param ProductService $service
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     */
+    public function getHotProduct(Request $request, ProductService $service)
+    {
+        $products = $service->getHotProducts($request->input('page', 1));
+
+        return ProductResource::collection($products);
+    }
+
+    public function getCategories(Request $request, ProductService $service)
+    {
+        $categories = $service->getCategoryTree();
+
+        return ProductResource::collection($categories);
+    }
+
+    /**
+     * 某个商品的评价
+     *
+     * @param Request $request
+     * @param $id
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     */
+    public function reviews(Request $request, $id)
+    {
+        $reviews = Product::query()->findOrFail($id)
+            ->orderItems()
+            ->with(['user', 'productSku'])
+            ->paginate($request->input('limit', 10));
+
+        return OrderItemResource::collection($reviews);
     }
 }

@@ -25,7 +25,10 @@ class UserResource extends JsonResource
             $this->resource->addHidden(['phone', 'email']);
         }
 
-        $data = parent::toArray($request);
+        $data = [
+            'avatar' => $this->avatar,
+            'nickname' => $this->nickname,
+        ];
 
         $data['bound_phone'] = $this->resource->phone ? true : false;
         $data['bound_wechat'] = ($this->resource->wechat_unionid || $this->resource->wechat_openid) ? true : false;

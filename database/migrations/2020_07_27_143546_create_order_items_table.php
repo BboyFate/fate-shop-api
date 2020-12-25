@@ -15,16 +15,16 @@ class CreateOrderItemsTable extends Migration
     {
         Schema::create('order_items', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('order_id');
-            $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
             $table->unsignedBigInteger('product_id');
-            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
             $table->unsignedBigInteger('product_sku_id');
-            $table->foreign('product_sku_id')->references('id')->on('product_skus')->onDelete('cascade');
             $table->unsignedInteger('amount')->comment('下单的数量');
             $table->decimal('price', 10, 2)->comment('单价');
             $table->unsignedInteger('rating')->nullable()->comment('用户打分');
             $table->text('review')->nullable()->comment('用户评价');
+            $table->json('images')->nullable()->comment('评论图片');
+            $table->boolean('is_verified')->default(false)->comment('是否审核通过');
             $table->dateTime('reviewed_at')->nullable()->comment('用户评价时间');
         });
     }
