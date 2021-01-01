@@ -120,4 +120,7 @@ return [
 
     // 默认超级管理员的角色名称
     'super_admin_role_name' => 'SuperAdmin',
+
+    // 默认的时间
+    'default_datetime' => '1000-01-01 00:00:00',
 ];

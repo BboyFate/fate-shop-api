@@ -2,20 +2,24 @@
 
 namespace App\Http\Controllers\V1;
 
+use App\Events\OrderItemReviewed;
+use App\Models\OrderItemReview;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Validation\Rule;
+use Carbon\Carbon;
+use Spatie\QueryBuilder\QueryBuilder;
 use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\UserAddress;
 use App\Models\ProductSku;
 use App\Models\CrowdfundingProduct;
 use App\Models\Product;
-use App\Http\Queries\OrderQuery;
 use App\Http\Resources\OrderResource;
+use App\Http\Resources\OrderItemResource;
 use App\Services\OrderService;
 use App\Events\OrderReviewed;
-use Carbon\Carbon;
 
 class OrdersController extends Controller
 {
@@ -23,15 +27,82 @@ class OrdersController extends Controller
      * 订单列表
      *
      * @param Request $request
-     * @param OrderQuery $query
-     *
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
-    public function index(Request $request, OrderQuery $query)
+    public function index(Request $request)
     {
-        $orders = $query->where('user_id', $request->user()->id)->paginate();
+        $this->validateRequest($request);
 
-        return OrderResource::collection($orders);
+        $limit = $request->input('limit', 10);
+        $user = $request->user();
+        $builder = OrderItem::query()
+            ->where('user_id', $user->id)
+            ->with(['order', 'productSku']);
+
+        $type = $request->input('type');
+
+        if ($type != 'all') {
+            $builder->whereHas('order', function ($query) {
+                $query->where('closed', false);
+            });
+
+            switch ($type) {
+                // 待付款
+                case 'pending':
+                    $builder->whereHas('order', function ($query) {
+                        $query->where('paid_at', config('app.default_datetime'));
+                    });
+                    break;
+                // 待发货
+                case 'ship_pending':
+                    $builder->whereHas('order', function ($query) {
+                        $query->where('ship_status', Order::SHIP_STATUS_PENDING)
+                            ->where('paid_at', '>', config('app.default_datetime'));
+                    });
+                    break;
+                // 待收货
+                case 'delivered':
+                    $builder->whereHas('order', function ($query) {
+                        $query->where('ship_status', Order::SHIP_STATUS_DELIVERED);
+                    });
+                    break;
+                // 评价
+                case 'review':
+                    $builder->whereHas('order', function ($query) {
+                        $query->where('ship_status', Order::SHIP_STATUS_RECEIVED);
+                    });
+                    break;
+            }
+        }
+
+        if (in_array($type, ['ship_pending', 'delivered', 'review'])) {
+            // 过滤掉一些申请售后
+            $builder->where('refund_status', OrderItem::REFUND_STATUS_PENDING);
+        }
+
+
+        $orders = $builder->paginate($limit);
+
+        return OrderItemResource::collection($orders);
+    }
+
+    /**
+     * 退款售后列表
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     */
+    public function afterSales(Request $request)
+    {
+        $limit = $request->input('limit', 10);
+        $user = $request->user();
+
+        $items =  OrderItem::query()
+            ->where('user_id', $user->id)
+            ->where('is_applied_refund', true)
+            ->paginate($limit);
+
+        return OrderItemResource::collection($items);
     }
 
     /**
@@ -45,11 +116,14 @@ class OrdersController extends Controller
     public function store(Request $request, OrderService $orderService)
     {
         $user = $request->user();
-        $this->validateRequest($request, $this->storeRequestValidationRules($user, $request->input('items')));
+        $this->validateRequest($request);
 
-        $address = UserAddress::find($request->input('address_id'));
-
-        $order = $orderService->store($user, $address, $request->input('remark'), $request->input('items'));
+        $order = $orderService->store(
+            $user,
+            $request->input('address'),
+            $request->input('remark'),
+            $request->input('items')
+        );
 
         return new OrderResource($order);
     }
@@ -62,6 +136,7 @@ class OrdersController extends Controller
      *
      * @return OrderResource
      */
+    // TODO: 暂不可用
     public function crowdfunding(Request $request, OrderService $orderService)
     {
         $this->validateRequest($request, $this->crowdfundingRequestValidationRules());
@@ -84,6 +159,7 @@ class OrdersController extends Controller
      *
      * @return OrderResource
      */
+    // TODO: 暂不可用
     public function seckill(Request $request, OrderService $orderService)
     {
         $this->validateRequest($request, $this->seckillRequestValidationRules());
@@ -135,125 +211,112 @@ class OrdersController extends Controller
     }
 
     /**
-     * 订单评价
+     * 子订单删除
      *
      * @param Request $request
-     * @param $id
-     *
-     * @return \Illuminate\Http\JsonResponse|void
+     * @param $orderId
+     * @param $itemId
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Resources\Json\JsonResource|void
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    public function sendReview(Request $request, $id)
+    public function destroyItem(Request $request, $orderId, $itemId)
     {
-        $this->validateRequest($request, $this->sendReviewRequestValidationRules($request->route('order')));
-        $order = Order::query()->findOrFail($id);
+        $order = Order::query()->findOrFail($orderId);
+        $orderItem = OrderItem::query()->findOrFail($itemId);
+        if ($order->id != $orderItem->order_id) {
+            return $this->response->errorNotFound();
+        }
         $this->authorize('own', $order);
 
-        if (! $order->paid_at) {
+        $orderItem->delete();
+        return $this->response->noContent();
+    }
+
+    /**
+     * 子订单评论
+     *
+     * @param Request $request
+     * @param $orderId
+     * @param $itemId
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Resources\Json\JsonResource|void
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
+    public function reviewItem(Request $request, $orderId, $itemId)
+    {
+        $this->validateRequest($request);
+        $order = Order::query()->findOrFail($orderId);
+        $orderItem = OrderItem::query()->findOrFail($itemId);
+        if ($order->id != $orderItem->order_id) {
+            return $this->response->errorNotFound();
+        }
+        $this->authorize('own', $order);
+
+        if (! $order->paid_at || $order->paid_at == config('app.default_datetime')) {
             return $this->response->errorForbidden('该订单未支付，不可评价');
         }
-
-        if ($order->reviewed) {
+        if ($orderItem->reviewed) {
             return $this->response->errorForbidden('该订单已评价，不可重复提交');
         }
 
-        $reviews = $request->input('reviews');
+        $reviewData = $request->input('review');
+        $user = $request->user();
 
-        \DB::transaction(function () use ($reviews, $order) {
-            foreach ($reviews as $review) {
-                $orderItem = $order->items()->find($review['id']);
-                // 保存评分和评价
-                $orderItem->update([
-                    'rating'      => $review['rating'],
-                    'review'      => $review['review'],
-                    'reviewed_at' => Carbon::now(),
-                ]);
-            }
+        \DB::transaction(function () use ($reviewData, $orderItem, $user) {
+            // 创建评价
+            $review = $orderItem->review()->create([
+                'rating'      => $reviewData['rating'],
+                'review'      => $reviewData['review'],
+                'images'      => $reviewData['images'] || [],
+                'reviewed_at' => Carbon::now(),
+            ]);
+            $review->user()->associate($user);
+            $review->product()->associate($orderItem->product_id);
+            $review->productSku()->associate($orderItem->product_sku_id);
 
             // 将订单标记为已评价
-            $order->update(['reviewed' => true]);
+            $orderItem->update(['reviewed' => true]);
 
-            event(new OrderReviewed($order));
+            event(new OrderItemReviewed($orderItem));
         });
 
         return $this->response->success();
     }
 
     /**
-     * 订单申请退款
+     * 子订单申请退款
      *
      * @param Request $request
-     * @param $id
-     *
-     * @return \Illuminate\Http\JsonResponse|void
+     * @param $orderId
+     * @param $itemId
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Resources\Json\JsonResource|void
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    public function applyRefund(Request $request, $id)
+    public function applyRefundItem(Request $request, $orderId, $itemId)
     {
-        $order = Order::query()->findOrFail($id);
+        $order = Order::query()->findOrFail($orderId);
+        $orderItem = OrderItem::query()->findOrFail($itemId);
         $this->authorize('own', $order);
 
-        if (! $order->paid_at) {
+        if (! $order->paid_at || $order->paid_at == config('app.default_datetime')) {
             return $this->response->errorForbidden('该订单未支付，不可退款');
         }
-
         if ($order->type === Order::TYPE_CROWDFUNDING) {
             return $this->response->errorForbidden('众筹订单不支持退款');
         }
-
-        if ($order->refund_status !== Order::REFUND_STATUS_PENDING) {
+        if ($orderItem->refund_status !== OrderItem::REFUND_STATUS_PENDING) {
             return $this->response->errorForbidden('该订单已经申请过退款，请勿重复申请');
         }
 
         // 将用户输入的退款理由放到订单的 extra 字段中
-        $extra                  = $order->extra ?: [];
+        $extra                  = $orderItem->extra ?: [];
         $extra['refund_reason'] = $request->input('reason');
         // 将订单退款状态改为已申请退款
-        $order->update([
-            'refund_status' => Order::REFUND_STATUS_APPLIED,
+        $orderItem->update([
+            'refund_status' => OrderItem::REFUND_STATUS_APPLIED,
             'extra'         => $extra,
         ]);
 
         return $this->response->success();
-    }
-
-    public function storeRequestValidationRules($user, $items)
-    {
-        return [
-            // 判断用户提交的地址 ID 是否存在于数据库并且属于当前用户
-            // 后面这个条件非常重要，否则恶意用户可以用不同的地址 ID 不断提交订单来遍历出平台所有用户的收货地址
-            'address_id'     => [
-                'required',
-                Rule::exists('user_addresses', 'id')->where('user_id', $user->id),
-            ],
-            'items'  => ['required', 'array'],
-            'items.*.sku_id' => [ // 检查 items 数组下每一个子数组的 sku_id 参数
-                'required',
-                function ($attribute, $value, $fail) use ($items) {
-                    if (! $sku = ProductSku::find($value)) {
-                        return $fail('该商品不存在');
-                    }
-
-                    if (! $sku->product->on_sale) {
-                        return $fail('该商品未上架');
-                    }
-
-                    if ($sku->stock === 0) {
-                        return $fail('该商品已售完');
-                    }
-
-                    // 获取当前索引
-                    preg_match('/items\.(\d+)\.sku_id/', $attribute, $m);
-                    $index = $m[1];
-                    // 根据索引找到用户所提交的购买数量
-                    $amount = $items[$index]['amount'];
-                    if ($amount > 0 && $amount > $sku->stock) {
-                        return $fail('该商品库存不足');
-                    }
-                },
-            ],
-            'items.*.amount' => ['required', 'integer', 'min:1'],
-        ];
     }
 
     public function crowdfundingRequestValidationRules()
@@ -357,19 +420,6 @@ class OrdersController extends Controller
                     }
                 }
             ],
-        ];
-    }
-
-    public function sendReviewRequestValidationRules($orderId)
-    {
-        return [
-            'reviews'          => ['required', 'array'],
-            'reviews.*.id'     => [
-                'required',
-                Rule::exists('order_items', 'id')->where('order_id', $orderId)
-            ],
-            'reviews.*.rating' => ['required', 'integer', 'between:1,5'],
-            'reviews.*.review' => ['required'],
         ];
     }
 }

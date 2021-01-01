@@ -17,14 +17,17 @@ class OrderResource extends JsonResource
         return [
             'id'           => $this->id,
             'no'           => $this->no,
-            'user_id'      => $this->user_id,
             'address'      => $this->address,
             'total_amount' => $this->total_amount,
             'remark'       => $this->remark,
-            'created_at'   => $this->created_at->toDateTimeString(),
-            'updated_at'   => $this->updated_at->toDateTimeString(),
+            'ship_status'  => $this->ship_status,
+            'closed'       => $this->closed,
+            'payment_no'   => $this->payment_no,
+            'created_at'   => (string)$this->created_at,
+            'delivered_at' => (string)$this->delivered_at,
+            'paid_at'      => (string)$this->paid_at,
             'user'         => new UserResource($this->whenLoaded('user')),
-            'items'        => new OrderItemResource($this->whenLoaded('items')),
+            'items'        => OrderItemResource::collection($this->whenLoaded('items')),
         ];
     }
 }

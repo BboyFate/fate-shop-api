@@ -3,24 +3,48 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Ramsey\Uuid\Uuid;
 
 class OrderItem extends Model
 {
+    use SoftDeletes;
+
+    const REFUND_STATUS_PENDING = 'pending';
+    const REFUND_STATUS_APPLIED = 'applied';
+    const REFUND_STATUS_PROCESSING = 'processing';
+    const REFUND_STATUS_SUCCESS = 'success';
+    const REFUND_STATUS_FAILED = 'failed';
+    public static $refundStatusMap = [
+        self::REFUND_STATUS_PENDING    => '未退款',
+        self::REFUND_STATUS_APPLIED    => '已申请退款',
+        self::REFUND_STATUS_PROCESSING => '退款中',
+        self::REFUND_STATUS_SUCCESS    => '退款成功',
+        self::REFUND_STATUS_FAILED     => '退款失败',
+    ];
+
     protected $fillable = [
         'amount',
         'price',
-        'rating',
-        'review',
-        'images',
-        'is_verified',
-        'reviewed_at'
+        'refund_status',
+        'refund_no',
+        'refunded_money',
+        'refunded_at',
+        'refund_verified_at',
+        'is_applied_refund',
+        'extra',
+        'reviewed',
     ];
 
-    protected $dates = ['reviewed_at'];
+    protected $dates = [
+        'refunded_at',
+        'refund_verified_at',
+    ];
 
     protected $casts = [
-        'images'      => 'array',
-        'is_verified' => 'boolean',
+        'is_applied_refund' => 'boolean',
+        'reviewed'          => 'boolean',
+        'extra'             => 'array',
     ];
 
     public $timestamps = false;
@@ -40,19 +64,30 @@ class OrderItem extends Model
         return $this->belongsTo(Order::class);
     }
 
+    public function review()
+    {
+        return $this->belongsTo(OrderItemReview::class);
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
     /**
-     * 作用域 查询最新评论
-     * @param $query
-     * @param int $limit 查询条数
-     * @return mixed
+     * 生成唯一的退款订单号
+     *
+     * @return string
+     * @throws \Exception
      */
-    public function scopeRecentReviews($query, $limit = 3)
+    public static function getAvailableRefundNo()
     {
-        return $query->orderBy('reviewed_at', 'desc')->limit($limit);
+        do {
+            // Uuid类可以用来生成大概率不重复的字符串
+            $no = Uuid::uuid4()->getHex();
+            // 为了避免重复我们在生成之后在数据库中查询看看是否已经存在相同的退款订单号
+        } while (self::query()->where('refund_no', $no)->exists());
+
+        return $no;
     }
 }

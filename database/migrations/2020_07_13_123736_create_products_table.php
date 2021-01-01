@@ -29,7 +29,7 @@ class CreateProductsTable extends Migration
             $table->decimal('price', 10, 2)->default(0)->comment('SKU 最低价格');
             $table->dateTime('created_at');
             $table->dateTime('updated_at');
-            $table->softDeletes();
+            $table->dateTime('deleted_at')->nullable();
         });
     }
 

@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use App\Models\OrderItem;
 
 class CreateOrderItemsTable extends Migration
 {
@@ -21,11 +22,16 @@ class CreateOrderItemsTable extends Migration
             $table->unsignedBigInteger('product_sku_id');
             $table->unsignedInteger('amount')->comment('下单的数量');
             $table->decimal('price', 10, 2)->comment('单价');
-            $table->unsignedInteger('rating')->nullable()->comment('用户打分');
-            $table->text('review')->nullable()->comment('用户评价');
-            $table->json('images')->nullable()->comment('评论图片');
-            $table->boolean('is_verified')->default(false)->comment('是否审核通过');
-            $table->dateTime('reviewed_at')->nullable()->comment('用户评价时间');
+            $table->decimal('refunded_money', 10, 2)->default(0)->comment('退款金额');
+            $table->string('refund_status')->default(OrderItem::REFUND_STATUS_PENDING)->comment('退款状态');
+            $table->boolean('is_applied_refund')->default(false)->comment('是否申请退款');
+            $table->string('refund_no')->unique()->nullable()->comment('退款单号');
+            $table->json('extra')->nullable()->comment('其他额外数据');
+            $table->boolean('reviewed')->default(false)->comment('订单是否已评价');
+
+            $table->dateTime('refunded_at')->default(config('app.default_datetime'))->comment('退款时间');
+            $table->dateTime('refund_verified_at')->default(config('app.default_datetime'))->comment('退款验证时间');
+            $table->dateTime('deleted_at')->nullable();
         });
     }
 

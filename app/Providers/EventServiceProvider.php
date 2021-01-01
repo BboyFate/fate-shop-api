@@ -21,7 +21,7 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\UpdateCrowdfundingProductProgress::class,    // 更新众筹订单的进度
         ],
         // 订单评价完成后的事件
-        \App\Events\OrderReviewed::class => [
+        \App\Events\OrderItemReviewed::class => [
             \App\Listeners\UpdateProductRating::class,  // 更新商品的评价
         ],
     ];

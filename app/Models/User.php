@@ -90,4 +90,9 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     {
         return $this->hasMany(UserSocial::class);
     }
+
+    public function orderReviews()
+    {
+        return $this->hasMany(OrderItemReview::class);
+    }
 }

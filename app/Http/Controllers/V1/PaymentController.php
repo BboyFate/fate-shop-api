@@ -79,7 +79,7 @@ class PaymentController extends Controller
         $failXml = '<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[FAIL]]></return_msg></xml>';
         $data = app('wechat_pay')->verify(null, true);
 
-        // 没有找到对应的订单，原则上不可能发生，保证代码健壮性
+        // 没有找到对应的订单
         if(!$order = Order::query()->where('no', $data['out_trade_no'])->first()) {
             return $failXml;
         }

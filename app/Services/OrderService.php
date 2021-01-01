@@ -23,18 +23,18 @@ class OrderService
      * @param array $items 下单的商品的信息 { sku_id, amount }
      * @return mixed
      */
-    public function store(User $user, UserAddress $address, $remark, $items)
+    public function store(User $user, array $addressData, $remark, $items)
     {
-        $order = \DB::transaction(function () use ($user, $address, $remark, $items) {
-            $address->update(['last_used_at' => Carbon::now()]);
+        $order = \DB::transaction(function () use ($user, $addressData, $remark, $items) {
+            // $address->update(['last_used_at' => Carbon::now()]);
 
             // 创建一个订单
             $order   = new Order([
                 'address'      => [
-                    'address'       => $address->full_address,
-                    'zip'           => $address->zip,
-                    'contact_name'  => $address->contact_name,
-                    'contact_phone' => $address->contact_phone,
+                    'address'       => $addressData['province'] . $addressData['city'] . $addressData['district'] . $addressData['address'],
+                    'zip'           => $addressData['zip'],
+                    'contact_name'  => $addressData['contact_name'],
+                    'contact_phone' => $addressData['contact_phone'],
                 ],
                 'remark'       => $remark,
                 'total_amount' => 0,
@@ -45,7 +45,7 @@ class OrderService
 
             $totalAmount = 0;
             foreach ($items as $data) {
-                $sku = ProductSku::find($data['sku_id']);
+                $sku = ProductSku::query()->find($data['sku_id']);
 
                 $item = $order->items()->make([
                     'amount' => $data['amount'],
@@ -129,7 +129,6 @@ class OrderService
         return $order;
     }
 
-
     public function seckill(User $user, array $addressData, ProductSku $sku)
     {
         $order = \DB::transaction(function () use ($user, $addressData, $sku) {
@@ -177,10 +176,11 @@ class OrderService
      * @param Order $order
      * @throws InternalException
      */
-    public function refundOrder(Order $order)
+    public function refundOrder(OrderItem $orderItem)
     {
+
         // 判断该订单的支付方式
-        switch ($order->payment_method) {
+        switch ($orderItem->payment_method) {
             case 'wechat':
                 // 生成退款订单号
                 $refundNo = Order::getAvailableRefundNo();

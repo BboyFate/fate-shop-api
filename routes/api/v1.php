@@ -108,13 +108,22 @@ $router->group([
         /**
          * 订单
          */
+        // 订单列表
         $router->get('orders', ['uses' => 'OrdersController@index', 'as' => 'api.v1.orders.index']);
+        // 订单详情
         $router->get('orders/{order:[0-9]+}', ['uses' => 'OrdersController@show', 'as' => 'api.v1.orders.show']);
+        // 创建订单
         $router->post('orders', ['uses' => 'OrdersController@store', 'as' => 'api.v1.orders.store']);
         $router->post('orders/{order:[0-9]+}/received', ['uses' => 'OrdersController@received', 'as' => 'api.v1.orders.received']);
-        $router->post('orders/{order:[0-9]+}/review', ['uses' => 'OrdersController@sendReview', 'as' => 'api.v1.orders.review.store']);
         $router->post('orders/{order:[0-9]+}/apply_refund', ['uses' => 'OrdersController@applyRefund', 'as' => 'api.v1.orders.apply_refund']);
         $router->post('crowdfunding_orders', ['uses' => 'OrdersController@crowdfunding', 'as' => 'api.v1.crowdfunding_orders.store']);
+        $router->get('orders/after_sales', ['uses' => 'OrdersController@afterSales', 'as' => 'api.v1.orders.afterSales']);
+        // 子订单删除
+        $router->delete('orders/{orderId:[0-9]+}/items/{itemId:[0-9]+}', ['uses' => 'OrdersController@destroyItem', 'as' => 'api.v1.orders.items.destroy']);
+        // 子订单评论
+        $router->post('orders/{orderId:[0-9]+}/items/{itemId:[0-9]+}/review', ['uses' => 'OrdersController@reviewItem', 'as' => 'api.v1.orders.items.review.store']);
+        // 子订单申请退款
+        $router->post('orders/{orderId:[0-9]+}/items/{itemId:[0-9]+}/apply_refund', ['uses' => 'OrdersController@applyRefundItem', 'as' => 'api.v1.orders.items.apply_refund']);
 
         /**
          * 支付

@@ -2,41 +2,33 @@
 
 namespace App\Listeners;
 
-use DB;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
-use App\Events\OrderReviewed;
-use App\Models\OrderItem;
+use Illuminate\Support\Facades\DB;
+use App\Events\OrderItemReviewed;
+use App\Models\OrderItemReview;
 
 class UpdateProductRating implements ShouldQueue
 {
     /**
-     * Handle the event.
+     * 更新商品评分
      *
-     * @param  OrderReviewed  $event
-     * @return void
+     * @param OrderItemReviewed $event
      */
-    public function handle(OrderReviewed $event)
+    public function handle(OrderItemReviewed $event)
     {
-        $items = $event->getOrder()->items()->with(['product'])->get();
+        $item = $event->getOrderItem()->with(['product'])->first();
 
-        foreach ($items as $item) {
-            $result = OrderItem::query()
-                ->where('product_id', $item->product_id)
-                ->whereNotNull('reviewed_at')
-                ->whereHas('order', function ($query) {
-                    $query->whereNotNull('paid_at');
-                })
-                ->first([
-                    DB::raw('count(*) AS review_count'),
-                    DB::raw('avg(rating) AS rating')
-                ]);
-
-            // 更新商品的评分和评价数
-            $item->product->update([
-                'rating'       => $result->rating,
-                'review_count' => $result->review_count,
+        $result = OrderItemReview::query()
+            ->where('product_id', $item->product_id)
+            ->first([
+                DB::raw('count(*) AS review_count'),
+                DB::raw('avg(rating) AS rating')
             ]);
-        }
+
+        // 更新商品的评分和评价数
+        $item->product->update([
+            'rating'       => $result->rating,
+            'review_count' => $result->review_count,
+        ]);
     }
 }
