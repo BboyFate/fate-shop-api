@@ -13,6 +13,7 @@ class UserAddress extends Model
         'contact_name',
         'contact_phone',
         'last_used_at',
+        'is_default',
     ];
 
     protected $appends = ['full_address'];
@@ -23,6 +24,10 @@ class UserAddress extends Model
      * @var array
      */
     protected $dates = ['last_used_at'];
+
+    protected $casts = [
+        'is_default' => 'boolean',
+    ];
 
     public function user()
     {
@@ -38,5 +43,15 @@ class UserAddress extends Model
     public function getFullAddressAttribute()
     {
         return "{$this->province}{$this->city}{$this->district}{$this->address}";
+    }
+
+    /**
+     * 作用域 默认地址
+     * @param $query
+     * @return mixed
+     */
+    public function scopeDefault($query)
+    {
+        return $query->where('is_default', true);
     }
 }

@@ -4,26 +4,27 @@ namespace App\Models;
 
 class OrderItemReview extends Model
 {
+    const UPDATED_AT = null;
+
     protected $fillable = [
         'rating',
         'review',
-        'images',
         'is_verified',
-        'reviewed_at',
         'verified_at',
     ];
 
     protected $dates = [
-        'reviewed_at',
         'verified_at',
     ];
 
     protected $casts = [
         'is_verified' => 'boolean',
-        'images'      => 'array',
     ];
 
-    public $timestamps = false;
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
 
     public function productSku()
     {
@@ -40,14 +41,21 @@ class OrderItemReview extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function images()
+    {
+        return $this->morphMany(UserImage::class, 'imageable');
+    }
+
     /**
      * 作用域 查询最新评论
+     *
      * @param $query
      * @param int $limit 查询条数
+     *
      * @return mixed
      */
     public function scopeRecentReviews($query, $limit = 3)
     {
-        return $query->orderBy('reviewed_at', 'desc')->limit($limit);
+        return $query->orderBy('created_at', 'desc')->limit($limit);
     }
 }

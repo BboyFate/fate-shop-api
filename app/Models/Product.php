@@ -27,6 +27,7 @@ class Product extends Model
         'image',
         'banners',
         'on_sale',
+        'is_free_shipping',
         'rating',
         'sold_count',
         'review_count',
@@ -34,8 +35,9 @@ class Product extends Model
     ];
 
     protected $casts = [
-        'on_sale' => 'boolean',
-        'banners' => 'array',
+        'on_sale'          => 'boolean',
+        'is_free_shipping' => 'boolean',
+        'banners'          => 'array',
     ];
 
     protected static function boot()
@@ -82,31 +84,19 @@ class Product extends Model
         return $this->hasOne(SeckillProduct::class);
     }
 
-    public function orderItems($isVerified = true)
+    public function orderItems()
     {
-        $builder = $this->hasMany(OrderItem::class);
-        if ($isVerified !== false) {
-            $builder->where('is_verified', true);
-        }
-        return $builder;
+        return $this->hasMany(OrderItem::class);
     }
 
-    /**
-     * 最近的评论
-     * 
-     * @return mixed
-     */
-    public function recentReviews()
+    public function reviews()
     {
-        return $this->orderItems()
-            ->whereNotNull('reviewed_at')
-            ->recentReviews();
+        return $this->hasMany(OrderItemReview::class);
     }
 
     /**
      * 访问器
      * 商品属性名称分组，属性值集合一起
-     *
      * @return mixed
      */
     public function getGroupedPropertiesAttribute()

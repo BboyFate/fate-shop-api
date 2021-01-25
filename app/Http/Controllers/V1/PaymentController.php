@@ -9,30 +9,6 @@ use Carbon\Carbon;
 
 class PaymentController extends Controller
 {
-    /**
-     * 微信小程序支付
-     *
-     * @param Request $request
-     * @param $id
-     *
-     * @throws \Illuminate\Auth\Access\AuthorizationException
-     */
-    public function payByWechatMiniapp(Request $request, $id) {
-        $order = Order::query()->findOrFail($id);
-        $this->authorize('own', $order);
-
-        // 校验订单状态
-        if ($order->paid_at || $order->closed) {
-            return $this->response->errorForbidden('订单状态不正确');
-        }
-
-        return app('wechat_pay')->miniapp([
-            'out_trade_no' => $order->no,  // 商户订单流水号，与支付宝 out_trade_no 一样
-            'total_fee'    => $order->total_amount * 100, // 与支付宝不同，微信支付的金额单位是分。
-            'body'         => '支付的订单：' . $order->no, // 订单描述
-            'openid'       => $request->user()->openid,
-        ]);
-    }
 
     /**
      * 微信支付服务器端回调

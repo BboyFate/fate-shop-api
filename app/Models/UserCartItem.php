@@ -4,7 +4,7 @@ namespace App\Models;
 
 class UserCartItem extends Model
 {
-    protected $fillable = ['amount'];
+    protected $fillable = ['qty'];
 
     public function user()
     {

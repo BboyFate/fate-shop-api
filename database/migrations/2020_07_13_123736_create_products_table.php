@@ -15,15 +15,16 @@ class CreateProductsTable extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('type')->default(\App\Models\Product::TYPE_NORMAL)->index();
+            $table->string('type', 32)->default(\App\Models\Product::TYPE_NORMAL)->index();
             $table->unsignedBigInteger('category_id')->index();
             $table->string('title')->comment('商品短标题');
             $table->string('long_title')->comment('商品长标题');
             $table->string('number', 64)->default('')->comment('商品货号');
             $table->string('image')->comment('商品封面图片');
-            $table->string('banners')->comment('商品轮播图');
+            $table->json('banners')->comment('商品轮播图');
             $table->boolean('on_sale')->default(true)->comment('商品是否正在售卖');
-            $table->float('rating')->default(5)->comment('商品平均评分');
+            $table->boolean('is_free_shipping')->default(false)->comment('是否免邮费');
+            $table->float('rating', 3, 2)->default(5)->comment('商品平均评分');
             $table->unsignedInteger('sold_count')->default(0)->comment('销量');
             $table->unsignedInteger('review_count')->default(0)->comment('评论数量');
             $table->decimal('price', 10, 2)->default(0)->comment('SKU 最低价格');

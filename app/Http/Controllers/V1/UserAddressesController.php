@@ -22,6 +22,19 @@ class UserAddressesController extends Controller
     }
 
     /**
+     * 用户默认地址
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Resources\Json\JsonResource
+     */
+    public function defaultAddress(Request $request)
+    {
+        $address = $request->user()->addresses()->default()->first();
+
+        return $this->response->success(new UserAddressResource($address));
+    }
+
+    /**
      * 用户新增地址
      *
      * @param Request $request
@@ -29,8 +42,11 @@ class UserAddressesController extends Controller
      */
     public function store(Request $request)
     {
-        $this->validateRequest($request, $this->storeAndUpdateRequestValidationRules());
+        $this->validateRequest($request, 'storeOrUpdate');
 
+        if ($request->input('is_default') == true) {
+            $request->user()->addresses()->update(['is_default', false]);
+        }
         $request->user()->addresses()->create($request->only([
             'province',
             'city',
@@ -39,6 +55,7 @@ class UserAddressesController extends Controller
             'zip',
             'contact_name',
             'contact_phone',
+            'is_default',
         ]));
 
         return $this->response->created();
@@ -48,19 +65,22 @@ class UserAddressesController extends Controller
      * 用户更新地址
      *
      * @param Request $request
-     * @param $id
+     * @param $addressId
      *
      * @return UserAddressResource
-     *
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $addressId)
     {
-        $this->validateRequest($request, $this->storeAndUpdateRequestValidationRules());
-        $userAddress = UserAddress::query()->findOrFail($id);
+        $this->validateRequest($request, 'storeOrUpdate');
+
+        $userAddress = UserAddress::query()->findOrFail($addressId);
 
         $this->authorize('own', $userAddress);
 
+        if ($request->input('is_default') == true) {
+            $request->user()->addresses()->update(['is_default' => false]);
+        }
         $userAddress->update($request->only([
             'province',
             'city',
@@ -69,6 +89,7 @@ class UserAddressesController extends Controller
             'zip',
             'contact_name',
             'contact_phone',
+            'is_default',
         ]));
 
         return new UserAddressResource($userAddress);
@@ -77,33 +98,19 @@ class UserAddressesController extends Controller
     /**
      * 用户删除地址
      *
-     * @param $id
+     * @param $addressId
      *
-     * @return \Illuminate\Http\JsonResponse
-     *
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Resources\Json\JsonResource
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    public function destroy($id)
+    public function destroy($addressId)
     {
-        $userAddress = UserAddress::query()->findOrFail($id);
+        $userAddress = UserAddress::query()->findOrFail($addressId);
 
         $this->authorize('own', $userAddress);
 
         $userAddress->delete();
 
         return $this->response->noContent();
-    }
-
-    public function storeAndUpdateRequestValidationRules()
-    {
-        return [
-            'province'      => 'required',
-            'city'          => 'required',
-            'district'      => 'required',
-            'address'       => 'required',
-            'zip'           => 'required',
-            'contact_name'  => 'required',
-            'contact_phone' => 'required',
-        ];
     }
 }

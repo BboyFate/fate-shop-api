@@ -82,21 +82,24 @@ $router->group([
          * 商品收藏
          */
         // 收藏列表
-        $router->get('products/favorites', ['uses' => 'ProductsController@favorites', 'as' => 'api.v1.products.favorites']);
+        $router->get('user/products/favorites', ['uses' => 'ProductsController@favorites', 'as' => 'api.v1.user.products.favorites.index']);
         // 收藏的某个商品
-        $router->get('products/{productId:[0-9]+}/favorite', ['uses' => 'ProductsController@favorite', 'as' => 'api.v1.products.favorite']);
+        $router->get('user/products/{productId:[0-9]+}/favorites', ['uses' => 'ProductsController@favoriteShow', 'as' => 'api.v1.user.products.favorites.show']);
         // 添加收藏
-        $router->post('products/{productId:[0-9]+}/favorite', ['uses' => 'ProductsController@favor', 'as' => 'api.v1.products.favor']);
+        $router->post('user/products/{productId:[0-9]+}/favorites', ['uses' => 'ProductsController@favoriteStore', 'as' => 'api.v1.user.products.favorites.store']);
         // 删除收藏
-        $router->delete('products/{productId:[0-9]+}/favorite', ['uses' => 'ProductsController@disfavor', 'as' => 'api.v1.products.disfavor']);
+        $router->delete('user/products/{productId:[0-9]+}/favorites', ['uses' => 'ProductsController@favoritesDestroy', 'as' => 'api.v1.user.products.favorites.destroy']);
+        // 删除多项收藏
+        $router->post('user/products/favorites', ['uses' => 'ProductsController@favoriteDestroys', 'as' => 'api.v1.user.products.favorites.destroys']);
 
         /**
          * 用户收货地址
          */
-        $router->get('user_addresses', ['uses' => 'UserAddressesController@index', 'as' => 'api.v1.user_addresses.index']);
-        $router->post('user_addresses', ['uses' => 'UserAddressesController@store', 'as' => 'api.v1.user_addresses.store']);
-        $router->put('user_addresses/{user_address:[0-9]+}', ['uses' => 'UserAddressesController@update', 'as' => 'api.v1.user_addresses.update']);
-        $router->delete('user_addresses/{user_address:[0-9]+}', ['uses' => 'UserAddressesController@destroy', 'as' => 'api.v1.user_addresses.destroy']);
+        $router->get('user/addresses', ['uses' => 'UserAddressesController@index', 'as' => 'api.v1.user.addresses.index']);
+        $router->get('user/addresses/default', ['uses' => 'UserAddressesController@defaultAddress', 'as' => 'api.v1.user.addresses.default']);
+        $router->post('user/addresses', ['uses' => 'UserAddressesController@store', 'as' => 'api.v1.user.addresses.store']);
+        $router->put('user/addresses/{addressId:[0-9]+}', ['uses' => 'UserAddressesController@update', 'as' => 'api.v1.user.addresses.update']);
+        $router->delete('user/addresses/{addressId:[0-9]+}', ['uses' => 'UserAddressesController@destroy', 'as' => 'api.v1.user.addresses.destroy']);
 
         /**
          * 购物车
@@ -110,24 +113,43 @@ $router->group([
          */
         // 订单列表
         $router->get('orders', ['uses' => 'OrdersController@index', 'as' => 'api.v1.orders.index']);
-        // 订单详情
-        $router->get('orders/{order:[0-9]+}', ['uses' => 'OrdersController@show', 'as' => 'api.v1.orders.show']);
         // 创建订单
         $router->post('orders', ['uses' => 'OrdersController@store', 'as' => 'api.v1.orders.store']);
-        $router->post('orders/{order:[0-9]+}/received', ['uses' => 'OrdersController@received', 'as' => 'api.v1.orders.received']);
-        $router->post('orders/{order:[0-9]+}/apply_refund', ['uses' => 'OrdersController@applyRefund', 'as' => 'api.v1.orders.apply_refund']);
-        $router->post('crowdfunding_orders', ['uses' => 'OrdersController@crowdfunding', 'as' => 'api.v1.crowdfunding_orders.store']);
-        $router->get('orders/after_sales', ['uses' => 'OrdersController@afterSales', 'as' => 'api.v1.orders.afterSales']);
-        // 子订单删除
+        // 订单详情
+        $router->get('orders/{orderId:[0-9]+}', ['uses' => 'OrdersController@showOrder', 'as' => 'api.v1.orders.show']);
+        // 取消订单
+        $router->post('orders/{orderId:[0-9]+}/close', ['uses' => 'OrdersController@closeOrder', 'as' => 'api.v1.orders.close']);
+        // 订单 微信小程序支付
+        $router->post('orders/{orderId:[0-9]+}/payment/weapp', ['uses' => 'OrdersController@payByWechatMiniapp', 'as' => 'api.v1.orders.payment.weapp']);
+        // 生成订单
+        $router->post('orders/generate', ['uses' => 'OrdersController@generateOrder', 'as' => 'api.v1.orders.generate']);
+        // 计算订单金额
+        $router->post('orders/calculate', ['uses' => 'OrdersController@calcOrder', 'as' => 'api.v1.orders.calc']);
+
+        // 子订单 售后理由列表
+        $router->get('orders/items/refunds/causes', ['uses' => 'OrderRefundsController@causes', 'as' => 'api.v1.orders.items.refunds.causes']);
+        // 子订单 售后列表
+        $router->get('orders/items/refunds', ['uses' => 'OrderRefundsController@refunds', 'as' => 'api.v1.orders.items.refunds.index']);
+        // 子订单 售后详情
+        $router->get('orders/items/refunds/{refundId:[0-9]+}', ['uses' => 'OrderRefundsController@refundShow', 'as' => 'api.v1.orders.items.refunds.show']);
+        // 子订单 提交售后
+        $router->post('orders/{orderId:[0-9]+}/items/{itemId:[0-9]+}/refunds', ['uses' => 'OrderRefundsController@refundStore', 'as' => 'api.v1.orders.items.refunds.store']);
+        // 子订单 删除售后单
+        $router->delete('orders/{orderId:[0-9]+}/items/{itemId:[0-9]+}/refunds', ['uses' => 'OrderRefundsController@refundDestroy', 'as' => 'api.v1.orders.items.refunds.destroy']);
+
+        // 子订单 详情
+        $router->get('orders/{orderId:[0-9]+}/items/{itemId:[0-9]+}', ['uses' => 'OrdersController@showOrderItem', 'as' => 'api.v1.orders.items.show']);
+        // 子订单 删除
         $router->delete('orders/{orderId:[0-9]+}/items/{itemId:[0-9]+}', ['uses' => 'OrdersController@destroyItem', 'as' => 'api.v1.orders.items.destroy']);
-        // 子订单评论
-        $router->post('orders/{orderId:[0-9]+}/items/{itemId:[0-9]+}/review', ['uses' => 'OrdersController@reviewItem', 'as' => 'api.v1.orders.items.review.store']);
-        // 子订单申请退款
-        $router->post('orders/{orderId:[0-9]+}/items/{itemId:[0-9]+}/apply_refund', ['uses' => 'OrdersController@applyRefundItem', 'as' => 'api.v1.orders.items.apply_refund']);
+        // 子订单 评论
+        $router->post('orders/{orderId:[0-9]+}/items/{itemId:[0-9]+}/review', ['uses' => 'OrdersController@itemReviewStore', 'as' => 'api.v1.orders.items.review.store']);
+        // 子订单 确认收货
+        $router->post('orders/{orderId:[0-9]+}/items/{itemId:[0-9]+}/received', ['uses' => 'OrdersController@receivedItem', 'as' => 'api.v1.orders.items.received']);
 
         /**
-         * 支付
+         * 图片
          */
-        $router->post('payment/{order:[0-9]+}/weapp', ['uses' => 'PaymentController@payByWechatMiniapp', 'as' => 'api.v1.payment.weapp']);
+        $router->post('user/images', ['uses' => 'UserImagesController@store', 'as' => 'api.v1.user.images.store']);
+        $router->delete('user/images/{imageId:[0-9]+}', [ 'uses' => 'UserImagesController@destroy', 'as' => 'api.v1.user.images.destroy']);
     });
 });

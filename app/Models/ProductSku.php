@@ -11,7 +11,9 @@ class ProductSku extends Model
         'image',
         'price',
         'stock',
-        'attributes'
+        'attributes',
+        'weight',
+        'volume',
     ];
 
     protected $casts = [
@@ -26,34 +28,34 @@ class ProductSku extends Model
     /**
      * 减库存 返回影响的行数
      *
-     * @param $amount 要减的库存量
+     * @param $qty 购买的数量
      * @return mixed
      * @throws InvalidRequestException
      */
-    public function decreaseStock($amount)
+    public function decreaseStock($qty)
     {
-        if ($amount < 0) {
+        if ($qty < 0) {
             throw new InvalidRequestException('减库存不可小于 0', 500);
         }
 
         return $this->where('id', $this->id)
-                    ->where('stock', '>=', $amount)
-                    ->decrement('stock', $amount);
+                    ->where('stock', '>=', $qty)
+                    ->decrement('stock', $qty);
     }
 
     /**
      * 增加库存
      *
-     * @param $amount 要增的库存量
+     * @param $qty 购买的数量
      * @return int
      * @throws InvalidRequestException
      */
-    public function addStock($amount)
+    public function addStock($qty)
     {
-        if ($amount < 0) {
+        if ($qty < 0) {
             throw new InvalidRequestException('加库存不可小于 0', 500);
         }
 
-        return $this->increment('stock', $amount);
+        return $this->increment('stock', $qty);
     }
 }

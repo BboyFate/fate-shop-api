@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Resources\OrderItemResource;
+use App\Http\Resources\OrderItemReviewResource;
+use App\Models\OrderItemReview;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use App\Models\Product;
@@ -97,8 +99,10 @@ class ProductsController extends Controller
      */
     public function show($id)
     {
-        $product = QueryBuilder::for(Product::class)
-            ->allowedIncludes(['skus', 'attributes', 'description', 'recentReviews.user'])
+        $product = Product::query()
+            ->with(['skus', 'attributes', 'description', 'reviews' => function ($query){
+                $query->recentReviews();
+            }])
             ->findOrFail($id);
 
         if (! $product->on_sale) {
@@ -122,11 +126,13 @@ class ProductsController extends Controller
     }
 
     /**
+     * 收藏商品的详情
+     *
      * @param Request $request
      * @param $id
      * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Resources\Json\JsonResource
      */
-    public function favorite(Request $request, $productId)
+    public function favoriteShow(Request $request, $productId)
     {
         $product = Product::query()->findOrFail($productId, 'id');
 
@@ -144,7 +150,7 @@ class ProductsController extends Controller
      * @param $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function favor(Request $request, $productId)
+    public function favoriteStore(Request $request, $productId)
     {
         $product = Product::query()->findOrFail($productId);
         $user = $request->user();
@@ -165,10 +171,26 @@ class ProductsController extends Controller
      * @param Request $request
      * @return array
      */
-    public function disfavor(Request $request, $id)
+    public function favoriteDestroy(Request $request, $id)
     {
         $product = Product::query()->findOrFail($id);
         $request->user()->favoriteProducts()->detach($product);
+
+        return $this->response->noContent();
+    }
+
+    /**
+     * 取消多项收藏的商品
+     *
+     * @param Request $request
+     *
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Resources\Json\JsonResource
+     */
+    public function favoriteDestroys(Request $request)
+    {
+        $this->validateRequest($request);
+
+        $request->user()->favoriteProducts()->detach($request->input('product_ids'));
 
         return $this->response->noContent();
     }
@@ -203,11 +225,14 @@ class ProductsController extends Controller
      */
     public function reviews(Request $request, $id)
     {
-        $reviews = Product::query()->findOrFail($id)
-            ->orderItems()
+        $reviews = OrderItemReview::query()
+            ->whereHasIn('product', function ($query) use ($id) {
+                $query->where('id', $id);
+            })
             ->with(['user', 'productSku'])
             ->paginate($request->input('limit', 10));
 
-        return OrderItemResource::collection($reviews);
+        return OrderItemReviewResource::collection($reviews);
+
     }
 }

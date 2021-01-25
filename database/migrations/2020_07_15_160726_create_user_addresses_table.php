@@ -16,7 +16,7 @@ class CreateUserAddressesTable extends Migration
         Schema::create('user_addresses', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('user_id');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->boolean('is_default')->default(false)->comment('默认地址');
             $table->string('province')->comment('省份');
             $table->string('city')->comment('城市');
             $table->string('district')->comment('区县');

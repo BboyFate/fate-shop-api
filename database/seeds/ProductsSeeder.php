@@ -47,8 +47,10 @@ class ProductsSeeder extends Seeder
                 $skusData[] = [
                     'name'       => $faker->word,
                     'image'      => $image->path,
-                    'price'      => $faker->randomNumber(4),
                     'stock'      => $faker->randomNumber(5),
+                    'price'      => $faker->randomFloat(2, 0.01, 10000),
+                    'weight'     => $faker->randomFloat(2, 0.01, 50),
+                    'volume'     => $faker->randomFloat(2, 0.01, 50),
                     'attributes' => $attributesTemp,
                 ];
             }

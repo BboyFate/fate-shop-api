@@ -12,20 +12,18 @@ $factory->define(OrderItem::class, function (Faker $faker) {
     // 从该商品的 SKU 中随机取一条
     $sku = $product->skus()->inRandomOrder()->first();
     // 10% 的概率把订单标记为退款
+    $qty = random_int(1, 5); // 购买数量随机 1 - 5 份
 
     $baseData = [
-        'amount'             => random_int(1, 5), // 购买数量随机 1 - 5 份
-        'price'              => $sku->price,
-        'product_id'         => $product->id,
-        'product_sku_id'     => $sku->id,
-        'extra'              => [],
-        'reviewed'           => false,
-
-        'refunded_money'     => 0,
-        'refund_status'      => OrderItem::REFUND_STATUS_PENDING,
-        'refund_no'          => null,
-        'refunded_at'        => config('app.default_datetime'),
-        'refund_verified_at' => config('app.default_datetime'),
+        'qty'               => $qty,
+        'price'             => $sku->price,
+        'price_total'       => $sku->price * $qty,
+        'product_id'        => $product->id,
+        'product_sku_id'    => $sku->id,
+        'is_reviewed'       => false,
+        'is_applied_refund' => false,
+        'extra'             => [],
+        'shipment_id'       => 0,
     ];
 
     return $baseData;

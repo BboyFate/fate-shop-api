@@ -21,8 +21,10 @@ $factory->define(ProductSku::class, function (Faker $faker) {
     $image = SystemImage::query()->inRandomOrder()->first();
 
     return [
-        'image' => $image->path,
-        'price' => $faker->randomNumber(4),
-        'stock' => $faker->randomNumber(5),
+        'image'  => $image->path,
+        'price'  => $faker->randomNumber(4),
+        'stock'  => $faker->randomNumber(5),
+        'weight' => $faker->randomFloat(2, 0.01, 50),
+        'volume' => $faker->randomFloat(2, 0.01, 50),
     ];
 });

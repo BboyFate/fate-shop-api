@@ -17,7 +17,7 @@ class CreateUserCartItemsTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('product_sku_id');
-            $table->unsignedInteger('amount');
+            $table->unsignedInteger('qty');
             $table->dateTime('created_at');
             $table->dateTime('updated_at');
         });

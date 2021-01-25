@@ -24,8 +24,8 @@ class CreateAdminVueMenus extends Migration
             $table->json('meta')->nullable()->comment('router 元信息');
             $table->unsignedTinyInteger('level')->comment('层级，0 表示最顶层');
             $table->string('str_ids')->comment('存储父子 ID 层级，方便筛选');
-            $table->unsignedTinyInteger('sorted')->default(0)->comment('菜单排序, 数值小的靠前');
-            $table->unsignedTinyInteger('is_showed')->default(true)->comment('默认显示');
+            $table->unsignedTinyInteger('sorted')->default(0)->comment('菜单排序, 数值大的靠前');
+            $table->boolean('is_showed')->default(true)->comment('默认显示');
             $table->dateTime('created_at');
             $table->dateTime('updated_at');
         });

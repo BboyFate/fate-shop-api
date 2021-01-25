@@ -26,12 +26,12 @@ class UserCartService
     /**
      * 商品添加到购物车
      *
-     * @param int $skuId 商品 SKU 的 ID
-     * @param int $amount 加购的数量
+     * @param $skuId 商品 SKU 的 ID
+     * @param $qty 加购的数量
      * @param bool $isAccrue 默认叠加加购数量
      * @return UserCartItem
      */
-    public function store($skuId, $amount, $isAccrue = true)
+    public function store($skuId, $qty, $isAccrue = true)
     {
         $user = Auth::user();
 
@@ -40,17 +40,17 @@ class UserCartService
             if ($isAccrue) {
                 // 叠加商品数量
                 $item->update([
-                    'amount' => $item->amount + $amount,
+                    'qty' => $item->qty + $qty,
                 ]);
             } else {
                 // 更新商品数量
                 $item->update([
-                    'amount' => $amount,
+                    'qty' => $qty,
                 ]);
             }
         } else {
             // 否则创建一个新的购物车记录
-            $item = new UserCartItem(['amount' => $amount]);
+            $item = new UserCartItem(['qty' => $qty]);
             $item->user()->associate($user);
             $item->productSku()->associate($skuId);
             $item->save();

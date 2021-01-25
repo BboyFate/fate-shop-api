@@ -31,7 +31,7 @@ class UserCartValidation
                         }
                     },
                 ],
-                'amount'  => ['required', 'integer', 'min:1'],
+                'qty'  => ['required', 'integer', 'min:1'],
                 '_accrue' => ['boolean']
             ],
         ];

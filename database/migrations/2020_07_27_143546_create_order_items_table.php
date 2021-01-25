@@ -20,17 +20,15 @@ class CreateOrderItemsTable extends Migration
             $table->unsignedBigInteger('order_id');
             $table->unsignedBigInteger('product_id');
             $table->unsignedBigInteger('product_sku_id');
-            $table->unsignedInteger('amount')->comment('下单的数量');
+            $table->unsignedBigInteger('shipment_id')->default(0)->comment('运输 外键');
+            $table->unsignedInteger('qty')->comment('下单的数量');
             $table->decimal('price', 10, 2)->comment('单价');
-            $table->decimal('refunded_money', 10, 2)->default(0)->comment('退款金额');
-            $table->string('refund_status')->default(OrderItem::REFUND_STATUS_PENDING)->comment('退款状态');
+            $table->decimal('price_total', 10, 2)->comment('单价 * 下单的数量');
+            $table->decimal('adjustment_total', 10, 2)->default(0)->comment('优惠或运费等等的价格');
+            $table->boolean('is_reviewed')->default(false)->comment('订单是否已评价');
             $table->boolean('is_applied_refund')->default(false)->comment('是否申请退款');
-            $table->string('refund_no')->unique()->nullable()->comment('退款单号');
             $table->json('extra')->nullable()->comment('其他额外数据');
-            $table->boolean('reviewed')->default(false)->comment('订单是否已评价');
-
-            $table->dateTime('refunded_at')->default(config('app.default_datetime'))->comment('退款时间');
-            $table->dateTime('refund_verified_at')->default(config('app.default_datetime'))->comment('退款验证时间');
+            $table->dateTime('created_at');
             $table->dateTime('deleted_at')->nullable();
         });
     }

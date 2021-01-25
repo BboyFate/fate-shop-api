@@ -22,7 +22,7 @@ class UpdateProductRating implements ShouldQueue
             ->where('product_id', $item->product_id)
             ->first([
                 DB::raw('count(*) AS review_count'),
-                DB::raw('avg(rating) AS rating')
+                DB::raw('IFNULL(avg(rating), 0) AS rating')
             ]);
 
         // 更新商品的评分和评价数

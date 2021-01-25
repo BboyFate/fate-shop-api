@@ -23,3 +23,20 @@ if (! function_exists('request')) {
         return is_null($value) ? value($default) : $value;
     }
 }
+
+if (! function_exists('formatFloat')) {
+    /**
+     * 格式化浮点数
+     * 奇进偶舍
+     *
+     * @param $value
+     * @param int $scale
+     * @return float
+     */
+    function formatFloat($value, $scale = 2)
+    {
+        $value = number_format($value, 2 + $scale, '.', '');
+
+        return round($value, $scale, PHP_ROUND_HALF_EVEN);
+    }
+}

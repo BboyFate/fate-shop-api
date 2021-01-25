@@ -19,7 +19,8 @@
         "spatie/laravel-permission": "^3.16",
         "spatie/laravel-query-builder": "^3.3",
         "tymon/jwt-auth": "^1.0",
-        "yansongda/laravel-pay": "^2.2"
+        "yansongda/laravel-pay": "^2.2",
+        "ext-json": "*"
     },
     "require-dev": {
         "fzaninotto/faker": "^1.4",

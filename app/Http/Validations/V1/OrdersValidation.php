@@ -49,13 +49,13 @@ class OrdersValidation
                         preg_match('/items\.(\d+)\.sku_id/', $attribute, $m);
                         $index = $m[1];
                         // 根据索引找到用户所提交的购买数量
-                        $amount = $items[$index]['amount'];
-                        if ($amount > 0 && $amount > $sku->stock) {
+                        $qty = $items[$index]['qty'];
+                        if ($qty > 0 && $qty > $sku->stock) {
                             return $fail('该商品库存不足');
                         }
                     },
                 ],
-                'items.*.amount'        => ['required', 'integer', 'min:1'],
+                'items.*.qty'           => ['required', 'integer', 'min:1'],
             ]
         ];
     }
@@ -63,20 +63,106 @@ class OrdersValidation
     /**
      * 订单评论
      */
-    public function sendReview()
+    public function itemReviewStore()
     {
-        $orderId = request()->route('order');
+        return [
+            'rules' => [
+                'rating'    => 'required|integer|between:1,5',
+                'review'    => 'required',
+                'image_ids' => 'array',
+            ]
+        ];
+    }
+
+    /**
+     * 子订单 申请退款
+     */
+    public function refundStore()
+    {
+        return [
+            'rules' => [
+                'reason'        => 'required',
+                'refund_qty'    => 'required|integer',
+                'refund_total'  => 'required|integer',
+                'order_id'      => 'required|integer',
+                'order_item_id' => 'required|integer',
+            ]
+        ];
+    }
+
+    /**
+     * 生成订单
+     */
+    public function generateOrder()
+    {
+        $items = request()->input('items');
 
         return [
             'rules' => [
-                'reviews'           => ['required', 'array'],
-                'reviews.*.item_id'     => [
+                'items'          => ['required', 'array'],
+                'items.*.sku_id' => [ // 检查 items 数组下每一个子数组的 sku_id 参数
                     'required',
-                    Rule::exists('order_items', 'id')->where('order_id', $orderId)
+                    function ($attribute, $value, $fail) use ($items) {
+                        if (!$sku = ProductSku::query()->find($value)) {
+                            return $fail('该商品不存在');
+                        }
+                        if (!$sku->product->on_sale) {
+                            return $fail('该商品已下架');
+                        }
+                        if ($sku->stock === 0) {
+                            return $fail('该商品已售完');
+                        }
+
+                        // 获取当前索引
+                        preg_match('/items\.(\d+)\.sku_id/', $attribute, $m);
+                        $index = $m[1];
+                        // 根据索引找到用户所提交的购买数量
+                        $qty = $items[$index]['qty'];
+                        if ($qty > 0 && $qty > $sku->stock) {
+                            return $fail('该商品库存不足');
+                        }
+                    },
                 ],
-                'reviews.*.rating'  => ['required', 'integer', 'between:1,5'],
-                'reviews.*.review'  => ['required'],
-                'reviews.*.images'  => ['array'],
+                'items.*.qty'    => ['required', 'integer', 'min:1'],
+            ]
+        ];
+    }
+
+    /**
+     * 计算订单价格
+     */
+    public function calcOrder()
+    {
+        $items = request()->input('items');
+
+        return [
+            'rules' => [
+                'province'       => 'string',
+                'items'          => ['required', 'array'],
+                'items.*.sku_id' => [ // 检查 items 数组下每一个子数组的 sku_id 参数
+                    'required',
+                    function ($attribute, $value, $fail) use ($items) {
+                        if (!$sku = ProductSku::query()->find($value)) {
+                            return $fail('该商品不存在');
+                        }
+                        if (!$sku->product->on_sale) {
+                            return $fail('该商品已下架');
+                        }
+                        if ($sku->stock === 0) {
+                            return $fail('该商品已售完');
+                        }
+
+                        // 获取当前索引
+                        preg_match('/items\.(\d+)\.sku_id/', $attribute, $m);
+                        $index = $m[1];
+                        // 根据索引找到用户所提交的购买数量
+                        $qty = $items[$index]['qty'];
+                        if ($qty > 0 && $qty > $sku->stock) {
+                            return $fail('该商品库存不足');
+                        }
+                    },
+                ],
+                'items.*.qty'    => ['required', 'integer', 'min:1'],
             ]
         ];
     }

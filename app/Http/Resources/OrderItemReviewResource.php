@@ -15,11 +15,12 @@ class OrderItemReviewResource extends JsonResource
     public function toArray($request)
     {
         $data = [
-            'rating'      => $this->rating,
-            'review'      => $this->review,
-            'images'      => $this->images,
-            'reviewed_at' => (string) $this->reviewed_at,
-            'sku'         => new ProductSkuResource($this->whenLoaded('productSku')),
+            'rating'     => $this->rating,
+            'review'     => $this->review,
+            'images'     => $this->images,
+            'created_at' => (string)$this->created_at,
+            'sku'        => new ProductSkuResource($this->whenLoaded('productSku')),
+            'user'       => new UserResource($this->whenLoaded('user')),
         ];
 
         return $data;

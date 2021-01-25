@@ -21,6 +21,8 @@ class CreateProductSkusTable extends Migration
             $table->decimal('price', 10, 2)->comment('SKU 价格');
             $table->unsignedInteger('stock')->comment('库存');
             $table->json('attributes');
+            $table->decimal('weight',10, 2)->default(0)->comment('重量 / kg');
+            $table->decimal('volume', 10, 2)->default(0)->comment('体积 / m³');
             $table->dateTime('created_at');
             $table->dateTime('updated_at');
             $table->softDeletes();

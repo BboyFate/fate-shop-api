@@ -15,9 +15,9 @@ class UserCartItemResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'id'     => $this->id,
-            'amount' => $this->amount,
-            'sku'    => new ProductSkuResource($this->whenLoaded('productSku')),
+            'id'  => $this->id,
+            'qty' => $this->qty,
+            'sku' => new ProductSkuResource($this->whenLoaded('productSku')),
         ];
     }
 }

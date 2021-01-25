@@ -2,15 +2,21 @@
 
 namespace App\Providers;
 
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Resources\Json\Resource;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Elasticsearch\ClientBuilder as ESClientBuilder;
 use Monolog\Logger;
 use Yansongda\Pay\Pay;
+use App\Models\UserImage;
 
 class AppServiceProvider extends ServiceProvider
 {
+    protected $validators = [
+        'poly_exists' => \App\Validators\PolyExistsValidator::class,
+    ];
+
     /**
      * Register any application services.
      *
@@ -37,6 +43,15 @@ class AppServiceProvider extends ServiceProvider
         // API 资源禁用顶层资源的包裹
         Resource::withoutWrapping();
 
+        $this->bootEloquentMorphs();
+
+        // 注册验证器
+        // $this->registerValidators();
+
+        // 商品观察者
+        \App\Models\Product::observe(\App\Observers\ProductObserver::class);
+
+        // 微信支付
         $this->app->singleton('wechat_pay', function () {
             $config = config('pay.wechat');
             $config['notify_url'] = route('api.v1.payment.wechat.notify');
@@ -56,7 +71,26 @@ class AppServiceProvider extends ServiceProvider
                 \Log::info(Str::replaceArray('?', $query->bindings, $query->sql));
             });
         }
+    }
 
-        \App\Models\Product::observe(\App\Observers\ProductObserver::class);
+    /**
+     * Register validators.
+     */
+//    protected function registerValidators()
+//    {
+//        foreach ($this->validators as $rule => $validator) {
+//            Validator::extend($rule, "{$validator}@validate");
+//        }
+//    }
+
+    /**
+    * 自定义多态关联的类型字段
+    */
+    private function bootEloquentMorphs()
+    {
+        Relation::morphMap([
+            UserImage::MORPH_ORDER_REFUND => \App\Models\OrderItemRefund::class,
+            UserImage::MORPH_ORDER_REVIEW => \App\Models\OrderItemReview::class,
+        ]);
     }
 }

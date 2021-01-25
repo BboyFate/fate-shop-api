@@ -41,7 +41,7 @@ class UserCartController extends Controller
 
         $this->cartService->store(
             $request->input('sku_id'),
-            $request->input('amount'),
+            $request->input('qty'),
             $request->input('_accrue', true)
         );
 
