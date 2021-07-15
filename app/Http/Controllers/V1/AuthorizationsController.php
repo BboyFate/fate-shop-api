@@ -11,8 +11,8 @@ use Illuminate\Support\Str;
 use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 use Overtrue\LaravelSocialite\Socialite;
 use Overtrue\LaravelWeChat\Facade as EasyWeChat;
-use App\Models\User;
-use App\Models\UserSocial;
+use App\Models\Users\User;
+use App\Models\Users\UserSocial;
 use App\Services\UserService;
 use App\Support\Contracts\ResponseConstant;
 

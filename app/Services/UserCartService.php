@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Auth;
-use App\Models\UserCartItem;
+use App\Models\Users\UserCartItem;
 
 class UserCartService
 {

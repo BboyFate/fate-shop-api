@@ -2,13 +2,12 @@
 
 namespace App\Services;
 
-use App\Http\Resources\UserAddressResource;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
-use App\Models\Order;
-use App\Models\ProductSku;
-use App\Models\User;
-use App\Models\UserAddress;
+use App\Models\Orders\Order;
+use App\Models\Products\ProductSku;
+use App\Models\Users\User;
+use App\Models\Users\UserAddress;
 use App\Jobs\CloseOrder;
 use App\Exceptions\InvalidRequestException;
 use Carbon\Carbon;
@@ -106,7 +105,9 @@ class OrderService
                 'adjustment_total'      => 0,   // 折扣的价格
                 'item_adjustment_total' => 0,   // 子订单的折扣总计
                 'address'               => [
-                    'address'       => $addressData['province'] . $addressData['city'] . $addressData['district'] . $addressData['address'],
+                    'province'      => $addressData['province'],
+                    'city'          => $addressData['city'],
+                    'district'      => $addressData['district'],
                     'zip'           => $addressData['zip'],
                     'contact_name'  => $addressData['contact_name'],
                     'contact_phone' => $addressData['contact_phone'],
@@ -284,40 +285,5 @@ class OrderService
         });
 
         return $order;
-    }
-
-    /**
-     * 订单退款逻辑
-     *
-     * @param Order $order
-     * @throws InternalException
-     */
-    public function refundOrder(OrderItem $orderItem)
-    {
-
-        // 判断该订单的支付方式
-        switch ($orderItem->payment_method) {
-            case 'wechat':
-                // 生成退款订单号
-                $refundNo = Order::getAvailableRefundNo();
-
-                app('wechat_pay')->refund([
-                    'out_trade_no'  => $order->no,
-                    'total_fee'     => $order->total_amount * 100,
-                    'refund_fee'    => $order->total_amount * 100,
-                    'out_refund_no' => $refundNo,
-                    'notify_url'    => route('api.v1.payment.wechat.refund_notify'),
-                ]);
-
-                $order->update([
-                    'refund_no'     => $refundNo,
-                    'refund_status' => Order::REFUND_STATUS_PROCESSING,
-                ]);
-
-                break;
-            default:
-                throw new InternalException('未知订单支付方式：' . $order->payment_method);
-                break;
-        }
     }
 }

@@ -5,7 +5,7 @@ namespace App\Admin\Http\Controllers\V1;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use App\Models\AdminUser;
+use App\Models\Systems\SysUser;
 
 class AuthorizationsController extends Controller
 {
@@ -20,15 +20,13 @@ class AuthorizationsController extends Controller
     {
         $this->validateRequest($request);
 
-        $admin = AdminUser::query()->where([
-            'username' => $request->username,
-        ])->first();
+        $admin = SysUser::query()->where('phone', $request->input('account'))->first();
 
         if (! $admin || ! Hash::check($request->password, $admin->password)) {
             return $this->response->errorUnprocessableEntity('账号或密码错误');
         }
         if ($admin->is_disabled) {
-            return $this->response->errorForbidden('账号无法登录');
+            return $this->response->errorForbidden('账号已冻结');
         }
 
         $token = Auth::claims(['guard' =>  Auth::getDefaultDriver()])->login($admin);
@@ -70,8 +68,8 @@ class AuthorizationsController extends Controller
     {
         return $this->response->success([
             'access_token' => $token,
-            'token_type' => 'Bearer',
-            'expires_in' => Auth::factory()->getTTL() * 60  // 单位秒
+            'token_type'   => 'Bearer',
+            'expires_in'   => Auth::factory()->getTTL() * 60  // 单位秒
         ]);
     }
 }

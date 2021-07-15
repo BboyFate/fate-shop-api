@@ -2,7 +2,7 @@
 
 namespace App\SearchBuilders;
 
-use App\Models\ProductCategory;
+use App\Models\Products\ProductCategory;
 
 class ProductSearchBuilder
 {

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\V1;
 
 use Illuminate\Http\Request;
-use App\Models\ProductSku;
+use App\Models\Products\ProductSku;
 use App\Http\Resources\UserCartItemResource;
 use App\Services\UserCartService;
 

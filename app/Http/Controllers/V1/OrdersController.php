@@ -2,27 +2,24 @@
 
 namespace App\Http\Controllers\V1;
 
-use App\Http\Resources\UserAddressResource;
-use App\Models\ExpressCompany;
-use App\Models\ExpressFee;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Validation\Rule;
-use Carbon\Carbon;
-use App\Models\Order;
-use App\Models\OrderItem;
-use App\Models\UserAddress;
-use App\Models\ProductSku;
-use App\Models\OrderItemShipment;
-use App\Models\CrowdfundingProduct;
-use App\Models\Product;
-use App\Models\UserImage;
+use App\Models\Users\UserAddress;
+use App\Models\Products\ProductSku;
+use App\Models\Orders\Order;
+use App\Models\Orders\OrderItem;
+use App\Models\Orders\OrderShipment;
+use App\Models\Products\CrowdfundingProduct;
+use App\Models\Products\Product;
+use App\Models\Users\UserImage;
 use App\Http\Resources\OrderResource;
 use App\Http\Resources\OrderItemResource;
 use App\Services\OrderService;
-use App\Events\OrderItemReviewed;
+use App\Events\Orders\OrderItemReviewed;
+use Carbon\Carbon;
 
 class OrdersController extends Controller
 {
@@ -44,8 +41,8 @@ class OrdersController extends Controller
             ->select('order_items.*')
             ->where('order_items.user_id', $user->id)
             ->with([
-                'shipment:id,shipment_state',
                 'order:id,no,order_state,payment_state,address',
+                'orderShipments:id,shipment_state',
                 'productSku:id,attributes,name,image'
             ]);
 
@@ -59,9 +56,8 @@ class OrdersController extends Controller
                 break;
             // 待发货
             case 'ship_pending':
-                $builder->where('shipment_id', '=', 0)
+                $builder->where('shipment_state', OrderItem::SHIPMENT_STATE_PENDING)
                     ->where('is_applied_refund', false);
-
                 $builder->join('orders', function ($join) {
                     $join->on('order_items.order_id', '=', 'orders.id')
                         ->where('orders.order_state', Order::ORDER_STATE_NEW);
@@ -69,15 +65,15 @@ class OrdersController extends Controller
                 break;
             // 待收货
             case 'delivered':
-                $builder->where('is_applied_refund', false);
-
+                $builder->where('receiving_state', OrderItem::RECEIVING_STATE_PENDING)
+                    ->where('is_applied_refund', false);
                 $builder->join('orders', function ($join) {
                     $join->on('order_items.order_id', '=', 'orders.id')
                         ->where('orders.order_state', Order::ORDER_STATE_NEW);
                 });
                 $builder->join('order_item_shipments', function ($join) {
                     $join->on('order_items.shipment_id', '=', 'order_item_shipments.id')
-                        ->where('order_item_shipments.shipment_state', OrderItemShipment::SHIPMENT_STATE_DELIVERED);
+                        ->where('order_item_shipments.shipment_state', OrderShipment::SHIPMENT_STATE_DELIVERED);
                 });
                 break;
             // 待评价
@@ -91,7 +87,7 @@ class OrdersController extends Controller
                 });
                 $builder->join('order_item_shipments', function ($join) {
                     $join->on('order_items.shipment_id', '=', 'order_item_shipments.id')
-                        ->where('order_item_shipments.shipment_state', OrderItemShipment::SHIPMENT_STATE_RECEIVED);
+                        ->where('order_item_shipments.shipment_state', OrderShipment::SHIPMENT_STATE_RECEIVED);
                 });
                 break;
         }
@@ -264,7 +260,7 @@ class OrdersController extends Controller
     {
         $user = $request->user();
 
-        $shipment = OrderItemShipment::query()
+        $shipment = OrderShipment::query()
             ->select('order_item_shipments.*')
             ->with(['orderItem'])
             ->join('order_items', function ($join) use ($itemId, $user) {
@@ -274,7 +270,7 @@ class OrdersController extends Controller
             })
             ->findOrFail();
 
-        return $this->response->success(new OrderItemShipment($shipment));
+        return $this->response->success(new OrderShipment($shipment));
     }
 
     /**
@@ -290,7 +286,7 @@ class OrdersController extends Controller
     public function showOrderItem($orderId, $itemId)
     {
         $orderItem = OrderItem::query()
-            ->with(['order', 'refund', 'shipment', 'productSku'])
+            ->with(['order', 'refunds', 'orderShipments', 'productSku'])
             ->findOrFail($itemId);
         $this->authorize('own', $orderItem->order);
 
@@ -317,13 +313,13 @@ class OrdersController extends Controller
         $this->authorize('own', $orderItem->order);
 
         // 判断是否为已发货
-        if ($orderItem->shipment->shipment_state !== OrderItemShipment::SHIPMENT_STATE_DELIVERED) {
+        if ($orderItem->shipment->shipment_state !== OrderShipment::SHIPMENT_STATE_DELIVERED) {
             return $this->response->errorForbidden('发货状态不正确');
         }
 
         // 更新为已收货
         $orderItem->shipment()->update([
-            'shipment_state' => OrderItemShipment::SHIPMENT_STATE_RECEIVED,
+            'shipment_state' => OrderShipment::SHIPMENT_STATE_RECEIVED,
             'received_at'    => Carbon::now(),
         ]);
 

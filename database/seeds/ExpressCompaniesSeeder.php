@@ -1,8 +1,8 @@
 <?php
 
 use Illuminate\Database\Seeder;
-use App\Models\ExpressCompany;
-use App\Models\ExpressFee;
+use App\Models\Expresses\ExpressCompany;
+use App\Models\Expresses\ExpressFee;
 
 class ExpressCompaniesSeeder extends Seeder
 {
@@ -31,16 +31,9 @@ class ExpressCompaniesSeeder extends Seeder
             $fee->items()->create([
                 'provinces' => ['广东省'],
                 'fees'      => [
-                    'weight' => [
-                        'first'     => 20,
-                        'first_fee' => 12,
-                        'renew_fee' => 0.8,
-                    ],
-                    'volume' => [
-                        'first'     => 20,
-                        'first_fee' => 12,
-                        'renew_fee' => 0.8,
-                    ],
+                    'first'     => 20,
+                    'first_fee' => 12,
+                    'renew_fee' => 0.8,
                 ],
             ]);
         }

@@ -8,7 +8,7 @@ class AuthorizationsValidation
     {
         return [
             'rules' => [
-                'username' => 'required|string',
+                'account' => 'required|string',
                 'password' => 'required|alpha_dash|min:6',
             ]
         ];

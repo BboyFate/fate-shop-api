@@ -119,7 +119,7 @@ return [
     'image_product' => '/commons/images/product.png',
 
     // 默认超级管理员的角色名称
-    'super_admin_role_name' => 'SuperAdmin',
+    'super_admin_name' => 'Super Admin',
 
     // 默认的时间
     'default_datetime' => '1000-01-01 00:00:00',

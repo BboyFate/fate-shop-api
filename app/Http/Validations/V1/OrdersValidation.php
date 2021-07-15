@@ -2,7 +2,7 @@
 
 namespace App\Http\Validations\V1;
 
-use App\Models\ProductSku;
+use App\Models\Products\ProductSku;
 use Illuminate\Validation\Rule;
 
 class OrdersValidation

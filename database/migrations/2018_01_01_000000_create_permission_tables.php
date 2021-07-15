@@ -22,10 +22,19 @@ class CreatePermissionTables extends Migration
 
         Schema::create($tableNames['permissions'], function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('name');
-            $table->string('description')->nullable();
-            $table->string('guard_name');
-            $table->timestamps();
+            $table->unsignedBigInteger('parent_id')->default(0);
+            $table->string('name')->unique()->comment('权限唯一标识');
+            $table->enum('type', array_keys(\App\Models\Systems\SysPermission::$typeMap))->comment('菜单类型');
+            $table->string('path')->default('')->comment('路由地址');
+            $table->string('component')->default('')->comment('组件路径');
+            $table->json('meta')->nullable()->comment('路由元信息');
+            $table->unsignedTinyInteger('sorted')->default(0)->comment('排序, 数值大的靠前');
+            $table->string('description')->nullable()->comment('描述');
+            $table->string('ids')->comment('存储父子 ID 层级，方便筛选');
+            $table->boolean('is_showed')->default(true)->comment('默认显示');
+            $table->string('guard_name', 32)->default('admin');
+            $table->dateTime('created_at');
+            $table->dateTime('updated_at');
         });
 
         Schema::create($tableNames['roles'], function (Blueprint $table) {
@@ -33,7 +42,8 @@ class CreatePermissionTables extends Migration
             $table->string('name');
             $table->string('description')->nullable();
             $table->string('guard_name');
-            $table->timestamps();
+            $table->dateTime('created_at');
+            $table->dateTime('updated_at');
         });
 
         Schema::create($tableNames['model_has_permissions'], function (Blueprint $table) use ($tableNames, $columnNames) {

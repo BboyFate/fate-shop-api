@@ -2,7 +2,7 @@
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
-use App\Models\ExpressFee;
+use App\Models\Expresses\ExpressFee;
 use Faker\Generator as Faker;
 
 $factory->define(ExpressFee::class, function (Faker $faker) {

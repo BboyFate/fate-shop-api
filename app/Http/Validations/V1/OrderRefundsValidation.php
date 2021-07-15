@@ -2,8 +2,7 @@
 
 namespace App\Http\Validations\V1;
 
-use App\Models\UserImage;
-use App\Models\OrderItemRefund;
+use App\Models\Orders\OrderItemRefund;
 
 class OrderRefundsValidation
 {

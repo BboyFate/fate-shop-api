@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers\V1;
 
-use App\Models\UserSocial;
 use Illuminate\Http\Request;
 use Overtrue\LaravelWeChat\Facade as EasyWeChat;
-use App\Models\User;
+use App\Models\Users\User;
 use App\Http\Resources\UserResource;
 
 class UsersController extends Controller

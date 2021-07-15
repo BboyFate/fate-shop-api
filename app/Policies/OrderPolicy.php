@@ -3,8 +3,8 @@
 namespace App\Policies;
 
 use Illuminate\Auth\Access\HandlesAuthorization;
-use App\Models\Order;
-use App\Models\User;
+use App\Models\Orders\Order;
+use App\Models\Users\User;
 
 class OrderPolicy
 {

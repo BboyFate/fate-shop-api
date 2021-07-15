@@ -4,8 +4,8 @@ namespace App\Listeners;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\DB;
-use App\Events\OrderItemReviewed;
-use App\Models\OrderItemReview;
+use App\Events\Orders\OrderItemReviewed;
+use App\Models\Orders\OrderItemReview;
 
 class UpdateProductRating implements ShouldQueue
 {

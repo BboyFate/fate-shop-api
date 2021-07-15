@@ -6,8 +6,10 @@
     "type": "project",
     "require": {
         "php": "^7.2",
+        "ext-json": "*",
         "doctrine/dbal": "^2.11",
         "elasticsearch/elasticsearch": "~7.0",
+        "gregwar/captcha": "^1.1",
         "illuminate/redis": "^6.18.31",
         "intervention/image": "^2.5",
         "laravel/lumen-framework": "^6.0",
@@ -19,8 +21,7 @@
         "spatie/laravel-permission": "^3.16",
         "spatie/laravel-query-builder": "^3.3",
         "tymon/jwt-auth": "^1.0",
-        "yansongda/laravel-pay": "^2.2",
-        "ext-json": "*"
+        "yansongda/laravel-pay": "^2.2"
     },
     "require-dev": {
         "fzaninotto/faker": "^1.4",

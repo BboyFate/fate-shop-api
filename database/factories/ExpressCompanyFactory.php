@@ -2,7 +2,7 @@
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
-use App\Models\ExpressCompany;
+use App\Models\Expresses\ExpressCompany;
 use Faker\Generator as Faker;
 
 $factory->define(ExpressCompany::class, function (Faker $faker) {

@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\Date;
+
 if (! function_exists('request')) {
     /**
      * Get an instance of the current request or an input item from the request.
@@ -38,5 +40,18 @@ if (! function_exists('formatFloat')) {
         $value = number_format($value, 2 + $scale, '.', '');
 
         return round($value, $scale, PHP_ROUND_HALF_EVEN);
+    }
+}
+
+if (! function_exists('now')) {
+    /**
+     * 创建当前时间
+     *
+     * @param null $tz
+     * @return \Illuminate\Support\Carbon
+     */
+    function now($tz = null)
+    {
+        return Date::now($tz);
     }
 }

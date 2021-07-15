@@ -1,7 +1,7 @@
 <?php
 namespace App\Console\Commands\Elasticsearch;
 
-use App\Models\Product;
+use App\Models\Products\Product;
 use Illuminate\Console\Command;
 
 class SyncProducts extends Command

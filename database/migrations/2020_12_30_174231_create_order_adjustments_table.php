@@ -17,6 +17,7 @@ class CreateOrderAdjustmentsTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('order_id')->default(0);
             $table->unsignedBigInteger('order_item_id')->default(0);
+            $table->unsignedBigInteger('order_item_unit_id')->default(0);
             $table->string('type')->comment('调整的类型：运费、促销等等');
             $table->string('label')->comment('结合 type 决定；例如：10元代金券、运费');
             $table->string('origin_code')->default('')->comment('结合 label 决定；例如：代金券的code');

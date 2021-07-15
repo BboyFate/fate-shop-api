@@ -1,9 +1,9 @@
 <?php
 
-use App\Models\SystemImage;
 use Illuminate\Database\Seeder;
-use App\Models\Product;
-use App\Models\ProductAttributeTemplate;
+use App\Models\Systems\SysMaterial;
+use App\Models\Products\Product;
+use App\Models\Products\ProductAttributeTemplate;
 
 class ProductsSeeder extends Seeder
 {
@@ -18,7 +18,7 @@ class ProductsSeeder extends Seeder
         $products = factory(Product::class, 30)->create();
 
         foreach ($products as $product) {
-            $image = SystemImage::query()->inRandomOrder()->first();
+            $image = SysMaterial::query()->randomByType(SysMaterial::TYPE_IMAGE)->first();
             $template = ProductAttributeTemplate::query()->inRandomOrder()->first();
 
             // SKU 多规格

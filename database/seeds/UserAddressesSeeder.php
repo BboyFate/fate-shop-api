@@ -1,8 +1,8 @@
 <?php
 
 use Illuminate\Database\Seeder;
-use App\Models\User;
-use App\Models\UserAddress;
+use App\Models\Users\User;
+use App\Models\Users\UserAddress;
 
 class UserAddressesSeeder extends Seeder
 {

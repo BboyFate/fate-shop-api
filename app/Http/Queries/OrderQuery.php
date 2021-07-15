@@ -2,8 +2,8 @@
 
 namespace App\Http\Queries;
 
-use App\Models\Order;
 use Spatie\QueryBuilder\QueryBuilder;
+use App\Models\Orders\Order;
 
 class OrderQuery extends QueryBuilder
 {

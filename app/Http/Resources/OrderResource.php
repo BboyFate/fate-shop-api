@@ -17,6 +17,7 @@ class OrderResource extends BaseResource
             'no'             => $this->no,
             'address'        => $this->address,
             'original_total' => $this->original_total,
+            'carriage_total' => $this->carriage_total,
             'payment_total'  => $this->payment_total,
             'qty_item'       => $this->qty_item,
             'is_closed'      => $this->is_closed,

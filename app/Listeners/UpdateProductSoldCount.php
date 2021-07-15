@@ -3,9 +3,8 @@
 namespace App\Listeners;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
-use App\Events\OrderPaid;
-use App\Models\OrderItem;
+use App\Events\Orders\OrderPaid;
+use App\Models\Orders\OrderItem;
 
 class UpdateProductSoldCount implements ShouldQueue
 {
@@ -28,7 +27,7 @@ class UpdateProductSoldCount implements ShouldQueue
                 ->where('product_id', $product->id)
                 ->whereHas('order', function ($query) {
                     $query->whereNotNull('paid_at');
-                })->sum('amount');
+                })->sum('qty');
 
             $product->update(['sold_count' => $soldCount]);
         }

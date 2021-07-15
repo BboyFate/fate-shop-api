@@ -9,7 +9,7 @@ use Illuminate\Support\Str;
 use Elasticsearch\ClientBuilder as ESClientBuilder;
 use Monolog\Logger;
 use Yansongda\Pay\Pay;
-use App\Models\UserImage;
+use App\Models\Users\UserImage;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -49,7 +49,7 @@ class AppServiceProvider extends ServiceProvider
         // $this->registerValidators();
 
         // 商品观察者
-        \App\Models\Product::observe(\App\Observers\ProductObserver::class);
+        \App\Models\Products\Product::observe(\App\Observers\ProductObserver::class);
 
         // 微信支付
         $this->app->singleton('wechat_pay', function () {
@@ -89,8 +89,8 @@ class AppServiceProvider extends ServiceProvider
     private function bootEloquentMorphs()
     {
         Relation::morphMap([
-            UserImage::MORPH_ORDER_REFUND => \App\Models\OrderItemRefund::class,
-            UserImage::MORPH_ORDER_REVIEW => \App\Models\OrderItemReview::class,
+            UserImage::MORPH_ORDER_REFUND => \App\Models\Orders\OrderItemRefund::class,
+            UserImage::MORPH_ORDER_REVIEW => \App\Models\Orders\OrderItemReview::class,
         ]);
     }
 }

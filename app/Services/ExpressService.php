@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use App\Models\ExpressCompany;
-use App\Models\ExpressFeeItem;
+use App\Models\Expresses\ExpressCompany;
+use App\Models\Expresses\ExpressFeeItem;
 
 class ExpressService extends  BaseService
 {

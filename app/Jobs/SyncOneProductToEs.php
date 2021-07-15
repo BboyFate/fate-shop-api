@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Models\Product;
+use App\Models\Products\Product;
 
 class SyncOneProductToEs extends Job
 {

@@ -3,7 +3,7 @@
 
 namespace App\Observers;
 
-use App\Models\Product;
+use App\Models\Products\Product;
 use App\Jobs\SyncOneProductToEs;
 
 class ProductObserver

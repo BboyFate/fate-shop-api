@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Database\Seeder;
-use App\Models\ProductAttributeTemplate;
+use App\Models\Products\ProductAttributeTemplate;
 
 class ProductAttributeTemplatesSeeder extends Seeder
 {
@@ -42,12 +42,7 @@ class ProductAttributeTemplatesSeeder extends Seeder
         ];
 
         foreach ($templates as $data) {
-            $this->createTemplate($data);
+            ProductAttributeTemplate::query()->create($data);
         }
-    }
-
-    public function createTemplate($data)
-    {
-        ProductAttributeTemplate::query()->create($data);
     }
 }

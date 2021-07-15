@@ -2,10 +2,10 @@
 
 namespace App\Services;
 
-use App\Models\Product;
-use App\Models\ProductCategory;
-use App\SearchBuilders\ProductSearchBuilder;
 use Illuminate\Pagination\LengthAwarePaginator;
+use App\Models\Products\Product;
+use App\Models\Products\ProductCategory;
+use App\SearchBuilders\ProductSearchBuilder;
 
 class ProductService
 {
@@ -26,6 +26,7 @@ class ProductService
             ]);
 
             $product->category()->associate($productData['category_id']);
+            $product->expressFee()->associate($productData['express_fee_id']);
             $product->save();
 
             // 众筹商品
@@ -61,6 +62,8 @@ class ProductService
                     'price'      => $data['price'],
                     'stock'      => $data['stock'],
                     'attributes' => $data['attributes'],
+                    'weight'     => $data['weight'],
+                    'volume'     => $data['volume'],
                 ]);
             }
 
@@ -134,6 +137,8 @@ class ProductService
                     'price'      => $skuData['price'],
                     'stock'      => $skuData['stock'],
                     'attributes' => $skuData['attributes'],
+                    'weight'     => $skuData['weight'],
+                    'volume'     => $skuData['volume'],
                 ];
 
                 if (isset($skuData['id'])) {

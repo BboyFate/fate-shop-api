@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Database\Seeder;
-use App\Models\OrderRefundCause;
+use App\Models\Orders\OrderRefundCause;
 
 class OrderRefundCausesSeeder extends Seeder
 {

@@ -3,8 +3,8 @@
 namespace App\Services;
 
 use App\Handlers\ImageUploadHandler;
-use App\Models\UserImage;
-use App\Models\User;
+use App\Models\Users\UserImage;
+use App\Models\Users\User;
 
 class UserImageService
 {

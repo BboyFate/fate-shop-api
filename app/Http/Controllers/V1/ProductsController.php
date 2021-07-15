@@ -2,19 +2,15 @@
 
 namespace App\Http\Controllers\V1;
 
-use App\Http\Resources\OrderItemResource;
-use App\Http\Resources\OrderItemReviewResource;
-use App\Models\OrderItemReview;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
-use App\Models\Product;
-use App\Models\ProductCategory;
+use App\Models\Products\Product;
+use App\Models\Products\ProductCategory;
+use App\Models\Orders\OrderItemReview;
+use App\Http\Resources\ProductResource;
+use App\Http\Resources\OrderItemReviewResource;
 use App\Services\ProductService;
 use App\SearchBuilders\ProductSearchBuilder;
-use App\Http\Resources\ProductResource;
-use Spatie\QueryBuilder\AllowedFilter;
-use Spatie\QueryBuilder\AllowedInclude;
-use Spatie\QueryBuilder\QueryBuilder;
 
 class ProductsController extends Controller
 {

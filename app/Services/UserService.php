@@ -3,8 +3,8 @@
 namespace App\Services;
 
 use Illuminate\Support\Str;
-use App\Models\User;
-use App\Models\UserSocial;
+use App\Models\Users\User;
+use App\Models\Users\UserSocial;
 
 class UserService
 {

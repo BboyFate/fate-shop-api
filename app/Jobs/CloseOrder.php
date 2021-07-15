@@ -6,8 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Redis;
-use App\Models\Order;
+use App\Models\Orders\Order;
 use App\Services\OrderService;
 
 class CloseOrder implements ShouldQueue

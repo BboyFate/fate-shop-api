@@ -1,8 +1,8 @@
 <?php
 
 use Illuminate\Database\Seeder;
-use App\Models\ProductCategory;
-use App\Models\SystemImage;
+use App\Models\Systems\SysMaterial;
+use App\Models\Products\ProductCategory;
 
 class ProductCategoriesSeeder extends Seeder
 {
@@ -66,7 +66,8 @@ class ProductCategoriesSeeder extends Seeder
 
     protected function createCategory($data, $parent = 0)
     {
-        $image = SystemImage::query()->inRandomOrder()->first();
+        $image = SysMaterial::query()->randomByType(SysMaterial::TYPE_IMAGE)->first();
+
         // 创建一个新的类目对象
         $category = new ProductCategory([
             'name' => $data['name'],

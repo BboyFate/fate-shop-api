@@ -4,7 +4,7 @@ namespace App\Http\Controllers\V1;
 
 use Illuminate\Http\Request;
 use App\Services\UserImageService;
-use App\Models\UserImage;
+use App\Models\Users\UserImage;
 use App\Http\Resources\UserImageResource;
 
 class UserImagesController extends Controller

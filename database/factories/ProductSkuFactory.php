@@ -3,8 +3,8 @@
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
 use Faker\Generator as Faker;
-use App\Models\ProductSku;
-use App\Models\SystemImage;
+use App\Models\Products\ProductSku;
+use App\Models\Systems\SysMaterial;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,7 +18,7 @@ use App\Models\SystemImage;
 */
 
 $factory->define(ProductSku::class, function (Faker $faker) {
-    $image = SystemImage::query()->inRandomOrder()->first();
+    $image = SysMaterial::query()->randomByType(SysMaterial::TYPE_IMAGE)->first();
 
     return [
         'image'  => $image->path,

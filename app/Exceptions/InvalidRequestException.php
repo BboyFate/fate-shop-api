@@ -7,7 +7,7 @@ use Exception;
 
 class InvalidRequestException extends Exception
 {
-    public function __construct($message = "", $code = 0)
+    public function __construct($message = "", $code = 500)
     {
         parent::__construct($message, $code);
     }
@@ -21,7 +21,11 @@ class InvalidRequestException extends Exception
     public function render(Request $request)
     {
         if ($request->expectsJson()) {
-            return response()->json(['message' => $this->message], $this->code);
+            // return response()->json(['message' => $this->message], $this->code);
+            return response()->json([
+                'status'  => 'fail',
+                'message' => $this->message,
+            ], $this->code);
         }
 
         return view('pages.error', ['message' => $this->message]);

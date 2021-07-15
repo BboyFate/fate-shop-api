@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\V1;
 
 use Illuminate\Http\Request;
-use App\Models\UserAddress;
+use App\Models\Users\UserAddress;
 use App\Http\Resources\UserAddressResource;
 
 class UserAddressesController extends Controller
@@ -73,14 +73,13 @@ class UserAddressesController extends Controller
     public function update(Request $request, $addressId)
     {
         $this->validateRequest($request, 'storeOrUpdate');
-
         $userAddress = UserAddress::query()->findOrFail($addressId);
-
         $this->authorize('own', $userAddress);
 
         if ($request->input('is_default') == true) {
             $request->user()->addresses()->update(['is_default' => false]);
         }
+
         $userAddress->update($request->only([
             'province',
             'city',

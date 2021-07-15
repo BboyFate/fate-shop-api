@@ -16,12 +16,12 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\ExampleListener::class,
         ],
         // 订单支付完成后的事件
-        \App\Events\OrderPaid::class => [
+        \App\Events\Orders\OrderPaid::class => [
             \App\Listeners\UpdateProductSoldCount::class,   // 更新商品销量
-            \App\Listeners\UpdateCrowdfundingProductProgress::class,    // 更新众筹订单的进度
+            // \App\Listeners\UpdateCrowdfundingProductProgress::class,    // 更新众筹订单的进度
         ],
         // 订单评价完成后的事件
-        \App\Events\OrderItemReviewed::class => [
+        \App\Events\Orders\OrderItemReviewed::class => [
             \App\Listeners\UpdateProductRating::class,  // 更新商品的评价
         ],
     ];
